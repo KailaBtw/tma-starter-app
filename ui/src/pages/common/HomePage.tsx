@@ -9,9 +9,11 @@ import {
     Button,
 } from '@mantine/core';
 import { designTokens } from '../../designTokens';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function HomePage() {
     const navigate = useNavigate();
+    const { userInfo } = useAuth();
 
     // Layout wrapper styles - HomePage doesn't need sidebar margin (it's a landing page)
     const layoutWrapperStyles: React.CSSProperties = {
@@ -46,7 +48,16 @@ export default function HomePage() {
                     </Text>
                     <Button
                         size="lg"
-                        onClick={() => navigate('/dashboard/courses')}
+                        onClick={() => {
+                            // Navigate to appropriate dashboard based on user role
+                            const userRole = userInfo?.role?.name;
+                            if (userRole === 'admin') {
+                                navigate('/dashboard/courses');
+                            } else {
+                                // For regular users, go to their courses page
+                                navigate('/dashboard/user/courses');
+                            }
+                        }}
                         style={{
                             marginTop: designTokens.spacing.sm,
                         }}

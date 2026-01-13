@@ -1,6 +1,8 @@
 username,email,password,role,email_verified,first_name,last_name,child_name,child_sex_assigned_at_birth,child_dob,avatar_url
+admin,admin@example.com,password,admin,true,Admin,User,,,,https://ui-avatars.com/api/?name=Admin+User&size=255&background=996F9D&color=fff&bold=true
 ksanft,ksanft@unca.edu,password,admin,true,Kevin,Sanft,,,,https://ui-avatars.com/api/?name=Kevin+Sanft&size=255&background=996F9D&color=fff&bold=true
 svanwart,svanwart@unca.edu,password,admin,true,Sarah,Van Wart,,,,https://ui-avatars.com/api/?name=Sarah+VanWart&size=255&background=669AC4&color=fff&bold=true
+user,user@example.com,password,user,true,User,Member,Alex,male,2023-05-15,https://ui-avatars.com/api/?name=User+Member&size=255&background=8B5A3C&color=fff&bold=true
 ashley_sanchez,ashley.sanchez@example.com,password,user,true,Ashley,Sanchez,Brandon,female,2023-03-28,https://ui-avatars.com/api/?name=Ashley+Sanchez&size=255&background=996F9D&color=fff&bold=true
 samantha_phelps,samantha.phelps@example.com,password,user,true,Samantha,Phelps,Joshua,female,2024-06-18,https://ui-avatars.com/api/?name=Samantha+Phelps&size=255&background=515251&color=fff&bold=true
 crystal_chapman,crystal.chapman@example.com,password,user,true,Crystal,Chapman,Courtney,other,2023-08-08,https://ui-avatars.com/api/?name=Crystal+Chapman&size=255&background=669AC4&color=fff&bold=true

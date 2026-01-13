@@ -14,6 +14,10 @@ import CourseDetailPage from './pages/courses/CourseDetailPage.tsx';
 import UsersPage from './pages/users/UsersPage.tsx';
 import CreateUserPage from './pages/users/CreateUserPage.tsx';
 import EditUserPage from './pages/users/EditUserPage.tsx';
+import UserGroupsPage from './pages/users/UserGroupsPage.tsx';
+import UserGroupDetailPage from './pages/users/UserGroupDetailPage.tsx';
+import UserCoursesPage from './pages/users/UserCoursesPage.tsx';
+import UserProgressPage from './pages/users/UserProgressPage.tsx';
 
 // Group pages
 import GroupsPage from './pages/groups/GroupsPage.tsx';
@@ -49,7 +53,7 @@ export default function App() {
                         <Route
                             path="/dashboard/courses"
                             element={
-                                <ProtectedRoute>
+                                <ProtectedRoute requiredRole="admin">
                                     <Layout>
                                         <CoursesPage />
                                     </Layout>
@@ -59,7 +63,7 @@ export default function App() {
                         <Route
                             path="/dashboard/courses/:courseId"
                             element={
-                                <ProtectedRoute>
+                                <ProtectedRoute requiredRole="admin">
                                     <Layout>
                                         <CourseDetailPage />
                                     </Layout>
@@ -69,7 +73,7 @@ export default function App() {
                         <Route
                             path="/dashboard/users"
                             element={
-                                <ProtectedRoute>
+                                <ProtectedRoute requiredRole="admin">
                                     <Layout>
                                         <UsersPage />
                                     </Layout>
@@ -79,7 +83,7 @@ export default function App() {
                         <Route
                             path="/dashboard/users/new"
                             element={
-                                <ProtectedRoute>
+                                <ProtectedRoute requiredRole="admin">
                                     <Layout>
                                         <CreateUserPage />
                                     </Layout>
@@ -89,7 +93,7 @@ export default function App() {
                         <Route
                             path="/dashboard/users/:userId/edit"
                             element={
-                                <ProtectedRoute>
+                                <ProtectedRoute requiredRole="admin">
                                     <Layout>
                                         <EditUserPage />
                                     </Layout>
@@ -99,7 +103,7 @@ export default function App() {
                         <Route
                             path="/dashboard/groups"
                             element={
-                                <ProtectedRoute>
+                                <ProtectedRoute requiredRole="admin">
                                     <Layout>
                                         <GroupsPage />
                                     </Layout>
@@ -109,9 +113,51 @@ export default function App() {
                         <Route
                             path="/dashboard/groups/:groupId"
                             element={
-                                <ProtectedRoute>
+                                <ProtectedRoute requiredRole="admin">
                                     <Layout>
                                         <GroupDetailPage />
+                                    </Layout>
+                                </ProtectedRoute>
+                            }
+                        />
+
+                        {/* User routes */}
+                        <Route
+                            path="/dashboard/user/groups"
+                            element={
+                                <ProtectedRoute>
+                                    <Layout>
+                                        <UserGroupsPage />
+                                    </Layout>
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/dashboard/user/groups/:groupId"
+                            element={
+                                <ProtectedRoute>
+                                    <Layout>
+                                        <UserGroupDetailPage />
+                                    </Layout>
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/dashboard/user/courses"
+                            element={
+                                <ProtectedRoute>
+                                    <Layout>
+                                        <UserCoursesPage />
+                                    </Layout>
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/dashboard/user/progress"
+                            element={
+                                <ProtectedRoute>
+                                    <Layout>
+                                        <UserProgressPage />
                                     </Layout>
                                 </ProtectedRoute>
                             }

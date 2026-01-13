@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Platform } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { designTokens } from '../../theme';
 
@@ -14,35 +14,25 @@ export default function TabsLayout() {
     const tabBarHeight =
         baseHeight + (Platform.OS === 'android' ? insets.bottom : 0);
 
+    // Dynamic style (depends on runtime values)
+    const tabBarStyle = {
+        ...styles.tabBarBase,
+        height: tabBarHeight,
+        paddingBottom: bottomPadding,
+    };
+
+    // Tab bar styling configuration
+    const screenOptions = {
+        headerShown: Boolean(false),
+        tabBarActiveTintColor: designTokens.tabBar.active,
+        tabBarInactiveTintColor: designTokens.tabBar.inactive,
+        tabBarStyle,
+        tabBarLabelStyle: styles.label,
+        tabBarIconStyle: styles.icon,
+    };
+
     return (
-        <Tabs
-            screenOptions={{
-                headerShown: Boolean(false),
-                tabBarActiveTintColor: designTokens.tabBar.active,
-                tabBarInactiveTintColor: designTokens.tabBar.inactive,
-                tabBarStyle: {
-                    backgroundColor: designTokens.tabBar.background,
-                    borderTopWidth: 1,
-                    borderTopColor: designTokens.tabBar.border,
-                    height: tabBarHeight,
-                    paddingBottom: bottomPadding,
-                    paddingTop: designTokens.spacing.sm,
-                    elevation: 8,
-                    shadowColor: designTokens.tabBar.shadow,
-                    shadowOffset: { width: 0, height: -2 },
-                    shadowOpacity: 0.1,
-                    shadowRadius: 4,
-                },
-                tabBarLabelStyle: {
-                    fontSize: 12,
-                    fontWeight: '600',
-                    marginTop: designTokens.spacing.xs,
-                },
-                tabBarIconStyle: {
-                    marginTop: designTokens.spacing.xs,
-                },
-            }}
-        >
+        <Tabs screenOptions={screenOptions}>
             <Tabs.Screen
                 name="home"
                 options={{
@@ -148,3 +138,25 @@ export default function TabsLayout() {
         </Tabs>
     );
 }
+
+const styles = StyleSheet.create({
+    tabBarBase: {
+        backgroundColor: designTokens.tabBar.background,
+        borderTopWidth: 1,
+        borderTopColor: designTokens.tabBar.border,
+        paddingTop: designTokens.spacing.sm,
+        elevation: 8,
+        shadowColor: designTokens.tabBar.shadow,
+        shadowOffset: { width: 0, height: -2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+    },
+    label: {
+        fontSize: 12,
+        fontWeight: '600',
+        marginTop: designTokens.spacing.xs,
+    },
+    icon: {
+        marginTop: designTokens.spacing.xs,
+    },
+});

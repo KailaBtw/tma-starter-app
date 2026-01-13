@@ -43,7 +43,8 @@ from models import (  # noqa: E402
 load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
-# DATABASE_URL = os.getenv("RAILWAY_DATABASE_URL")
+# DATABASE_URL = os.getenv("RAILWAY_DATABASE_URL_DEV")
+# DATABASE_URL = os.getenv("RAILWAY_DATABASE_URL_PROD")
 
 
 if not DATABASE_URL:

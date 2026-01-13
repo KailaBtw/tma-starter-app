@@ -335,30 +335,12 @@ Before committing your code:
 
 The GitHub Actions workflow will automatically verify everything passes!
 
----
 
-## Troubleshooting
-
-### Backend: "Command not found: black"
-
-Make sure you've installed the dev dependencies:
-
-```bash
-cd backend
-poetry install --with dev
-```
-
-### Frontend: "Command not found: eslint"
-
-Make sure you've installed the dependencies:
-
-```bash
-cd ui
-npm install
-```
-
-### CI Fails but Local Checks Pass
-
-1. Make sure you're running the same commands locally
-2. Check that you've committed all formatted files
-3. Pull the latest changes and try again
+## Testing
+* Backend: `docker exec -it tma_backend poetry run pytest`
+* Web: `docker exec -it tma_frontend npm run test:verbose`
+* Mobile: 
+    ```bash
+    cd mobile
+    npm run test:verbose
+    ```
