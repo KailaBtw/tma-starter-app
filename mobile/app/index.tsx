@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'expo-router';
 // Note: This component uses `useAuth()` which requires the component tree
 // to be wrapped in `<AuthProvider>` (defined in `_layout.tsx`).
-// If `AuthProvider` is removed or placed outside the `<Stack>`, 
+// If `AuthProvider` is removed or placed outside the `<Stack>`,
 // this will throw an error.
 import { useAuth } from '../contexts/AuthContext';
 import { View, ActivityIndicator } from 'react-native';

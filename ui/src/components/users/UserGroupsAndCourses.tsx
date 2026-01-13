@@ -18,13 +18,28 @@ import { useAuth } from '../../contexts/AuthContext';
 import {
     getGroups,
     getCourses,
-    getCourseGroups,
+    getGroupCourses,
     getGroup,
-    getUserProgress,
-    getCourseModules,
-    getPosts,
 } from '../../utils/api';
-import type { Group as ApiGroup, Course, UserProgress } from '../../types/api';
+import type { Group as ApiGroup, Course } from '../../types/api';
+
+// TODO: These types and functions will be implemented in future assignments
+interface CourseGroup {
+    course_id: number;
+    group_id: number;
+}
+
+// Types for future implementation (commented out until needed):
+// interface UserProgress {
+//     post_id: number;
+//     status_code: string;
+// }
+// interface CourseModule {
+//     module_id: number;
+// }
+// interface Post {
+//     id: number;
+// }
 
 interface CourseProgress {
     completed: number;
@@ -80,14 +95,34 @@ export default function UserGroupsAndCourses({
             setGroups(verifiedGroups);
 
             // Fetch all course-group relationships
-            const courseGroupsData = await getCourseGroups(null, null, API_URL);
+            // TODO: This will be implemented when course-group relationships API is available
+            const courseGroupsData: CourseGroup[] = [];
+            for (const group of verifiedGroups) {
+                try {
+                    const groupCourses = await getGroupCourses(
+                        group.id,
+                        API_URL
+                    );
+                    groupCourses.forEach((course) => {
+                        courseGroupsData.push({
+                            course_id: course.id,
+                            group_id: group.id,
+                        });
+                    });
+                } catch (err) {
+                    console.warn(
+                        `Error fetching courses for group ${group.id}:`,
+                        err
+                    );
+                }
+            }
 
             // Get unique course IDs from user's verified groups
             const userGroupIds = new Set(verifiedGroups.map((g) => g.id));
             const accessibleCourseIds = new Set(
                 courseGroupsData
-                    .filter((cg) => userGroupIds.has(cg.group_id))
-                    .map((cg) => cg.course_id)
+                    .filter((cg: CourseGroup) => userGroupIds.has(cg.group_id))
+                    .map((cg: CourseGroup) => cg.course_id)
             );
 
             // Fetch all courses and filter to only accessible ones
@@ -116,6 +151,20 @@ export default function UserGroupsAndCourses({
         if (!userInfo?.id) return;
 
         try {
+            // TODO: Progress tracking will be implemented in a future assignment
+            // For now, set all progress to 0
+            const progressMapData: Record<number, CourseProgress> = {};
+
+            for (const course of courses) {
+                // TODO: When modules and posts are implemented, calculate actual progress
+                progressMapData[course.id] = {
+                    completed: 0,
+                    total: 0,
+                    percentage: 0,
+                };
+            }
+
+            /* Future implementation:
             // Fetch all user progress for the current user
             const allProgress = await getUserProgress(
                 userInfo.id,
@@ -125,13 +174,11 @@ export default function UserGroupsAndCourses({
 
             // Create a map of post_id -> progress
             const progressMap: Record<number, UserProgress> = {};
-            allProgress.forEach((progress) => {
+            allProgress.forEach((progress: UserProgress) => {
                 progressMap[progress.post_id] = progress;
             });
 
             // Calculate progress for each course
-            const progressMapData: Record<number, CourseProgress> = {};
-
             for (const course of courses) {
                 try {
                     // Get all modules for this course
@@ -153,7 +200,7 @@ export default function UserGroupsAndCourses({
                             );
                             totalPosts += modulePosts.length;
                             completedPosts += modulePosts.filter(
-                                (post) =>
+                                (post: Post) =>
                                     progressMap[post.id]?.status_code ===
                                     'completed'
                             ).length;
@@ -181,12 +228,26 @@ export default function UserGroupsAndCourses({
                         err
                     );
                     progressMapData[course.id] = {
+                        completed: completedPosts,
+                        total: totalPosts,
+                        percentage:
+                            totalPosts > 0
+                                ? Math.round((completedPosts / totalPosts) * 100)
+                                : 0,
+                    };
+                } catch (err) {
+                    console.error(
+                        `Error calculating progress for course ${course.id}:`,
+                        err
+                    );
+                    progressMapData[course.id] = {
                         completed: 0,
                         total: 0,
                         percentage: 0,
                     };
                 }
             }
+            */
 
             setCourseProgress(progressMapData);
         } catch (err) {

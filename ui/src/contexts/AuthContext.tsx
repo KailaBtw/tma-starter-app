@@ -59,11 +59,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 setUserInfo(user);
             } else {
                 // Check if we got an authentication error
-                const errorData = (await response.json().catch(() => ({}))) as {
-                    detail?: string;
-                };
-                // errorMessage is logged for debugging but not used elsewhere
-                const _errorMessage = errorData.detail || response.statusText;
+                // Error data is available for debugging if needed
+                // const errorData = (await response.json().catch(() => ({}))) as {
+                //     detail?: string;
+                // };
+                // const errorMessage = errorData.detail || response.statusText;
 
                 localStorage.removeItem('auth_token');
                 localStorage.removeItem('token_type');

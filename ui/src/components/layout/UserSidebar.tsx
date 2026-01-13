@@ -90,7 +90,8 @@ export default function UserSidebar({ contentOnly = false }: UserSidebarProps) {
 
     const currentSection = getCurrentSection();
     const courseId = params.courseId;
-    const _moduleId = params.moduleId ? parseInt(params.moduleId) : null;
+    // Module ID will be used when module navigation is implemented
+    // const moduleId = params.moduleId ? parseInt(params.moduleId) : null;
 
     // Check if we're on a course or module page (memoized to prevent infinite loops)
     // Include both user routes and preview routes

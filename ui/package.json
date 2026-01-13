@@ -17,7 +17,7 @@
     "format:check": "prettier --check \"src/**/*.{js,jsx,ts,tsx,json,css}\"",
     "format:fix": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css}\"",
     "type-check": "tsc --noEmit",
-    "check": "npm run format:check && npm run lint:check",
+    "check": "npm run format:check && npm run lint:check && npm run type-check",
     "fix": "npm run format:fix && npm run lint:fix"
   },
   "keywords": [],

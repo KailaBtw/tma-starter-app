@@ -1,4 +1,4 @@
-import { Stack, Text, Alert, Card } from '@mantine/core';
+import { Stack, Alert, Card } from '@mantine/core';
 import { IconChartBar } from '@tabler/icons-react';
 import UserPageLayout from '../../components/layout/UserPageLayout';
 

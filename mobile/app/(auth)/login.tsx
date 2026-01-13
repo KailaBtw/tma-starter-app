@@ -7,6 +7,7 @@ import {
     Platform,
 } from 'react-native';
 import { TextInput, Button, Text, Snackbar } from 'react-native-paper';
+import type { TextInput as RNTextInput } from 'react-native';
 import { useAuth } from '../../contexts/AuthContext';
 import { designTokens } from '../../theme';
 
@@ -16,7 +17,7 @@ export default function LoginScreen() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [showPassword, setShowPassword] = useState(false);
-    const passwordInputRef = useRef<TextInput>(null);
+    const passwordInputRef = useRef<RNTextInput>(null);
     const { login } = useAuth();
 
     const handleLogin = async () => {

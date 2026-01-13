@@ -29,6 +29,9 @@ export interface User {
     is_active: boolean;
     created_at: string; // ISO datetime string
     updated_at: string; // ISO datetime string
+    child_name?: string | null;
+    child_sex_assigned_at_birth?: string | null;
+    child_dob?: string | null;
 }
 
 export interface Token {
@@ -58,6 +61,15 @@ export interface UserUpdate {
     is_active?: boolean | null;
 }
 
+export interface UserProfileUpdate {
+    first_name?: string | null;
+    last_name?: string | null;
+    child_name?: string | null;
+    child_sex_assigned_at_birth?: string | null;
+    child_dob?: string | null;
+    avatar_url?: string | null;
+}
+
 // ============================================================================
 // Course Types
 // ============================================================================
@@ -68,6 +80,7 @@ export interface Course {
     description?: string | null;
     created_at: string;
     updated_at: string;
+    module_count?: number; // Optional, may be added by backend in some responses
 }
 
 export interface CourseDetail extends Course {

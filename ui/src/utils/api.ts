@@ -5,6 +5,7 @@
 import type {
     User,
     UserCreate,
+    UserProfileUpdate,
     Group,
     GroupDetail,
     GroupCreate,
