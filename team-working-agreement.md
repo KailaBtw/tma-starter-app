@@ -1,4 +1,6 @@
-# Team "Starburst" working Agreement - Phase 1
+# Team "Starburst" working Agreement
+
+PHASE 1 STARBURST
 
 aka "The Startbursts"
 
