@@ -2,7 +2,7 @@
 
 PHASE 1 STARBURST
 
-aka "The Startbursts"
+aka "The St     artbursts"
 
 ## Communication
 - How will we communicate? (Slack, Discord, email, etc.)
