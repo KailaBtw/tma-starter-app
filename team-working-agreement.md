@@ -1,4 +1,6 @@
-# Team "Bee Movie" working Agreement - Phase 1
+# Team "Starburst" working Agreement - Phase 1
+
+aka "The Startbursts"
 
 ## Communication
 - How will we communicate? (Slack, Discord, email, etc.)
