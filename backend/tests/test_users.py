@@ -5,7 +5,7 @@ Contract-level tests for the /api/users endpoint
 import pytest
 from httpx import AsyncClient
 
-
+# List all users (DONE)
 @pytest.mark.asyncio
 async def test_get_all_users_requires_auth(client: AsyncClient):
     """Test that GET /api/users requires authentication"""
@@ -35,12 +35,17 @@ async def test_get_all_users_with_auth(client: AsyncClient, auth_headers, admin_
     admin_usernames = [user["username"] for user in data]
     assert "admin" in admin_usernames
 
-
+# Get a single user
 @pytest.mark.asyncio
 async def test_get_user_by_id_requires_auth(client: AsyncClient):
     """Test that GET /api/users/{id} requires authentication"""
     response = await client.get("/api/users/1")
     assert response.status_code == 401
+
+@pytest.mark.asyncio
+async def test_get_user_by_id_with_auth(client: AsyncClient, auth_headers, admin_user):
+    # """Test that GET /api/users/{id} returns list of users when authenticated"""
+     response = await client.get("/api/users/{id}", headers=auth_headers)
 
 
 @pytest.mark.asyncio
@@ -51,7 +56,7 @@ async def test_get_user_by_id_not_found(client: AsyncClient, auth_headers):
     data = response.json()
     assert "not found" in data["detail"].lower()
 
-
+# Create a new user (DONE)
 @pytest.mark.asyncio
 async def test_create_user_requires_auth(client: AsyncClient):
     """Test that POST /api/users requires authentication"""
@@ -136,3 +141,12 @@ async def test_create_user_duplicate_username(
     assert (
         get_response.json()["email"] == "first@example.com"
     )  # Original email unchanged
+
+
+# Update user
+
+# Delete user
+
+# Update user status
+
+# Update user role
