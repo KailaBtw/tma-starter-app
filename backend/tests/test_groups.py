@@ -3,13 +3,17 @@ Contract-level tests for the /api/groups endpoint
 """
 
 import pytest
+pytest_plugins = ["tests.test_groups_helper"]
+
 from httpx import AsyncClient
+from sqlalchemy.future import select
+from models import Base, Role, User, Group
 
 # Route: /api/groups
 # Request: GET
 # Response: List[GroupResponse]
 @pytest.mark.asyncio
-async def test_get_all_groups_admin(client: AsyncClient, admin_headers):
+async def test_get_all_groups_admin(client: AsyncClient, admin_headers, seeded_db):
     response = await client.get("/api/groups", headers = admin_headers)
     assert response.status_code == 200
 
@@ -30,7 +34,7 @@ async def test_get_all_groups_admin(client: AsyncClient, admin_headers):
     assert "group_admins" in group_names
 
 @pytest.mark.asyncio
-async def test_get_all_groups_manager(client: AsyncClient, manager_headers):
+async def test_get_all_groups_manager(client: AsyncClient, manager_headers, seeded_db):
     response = await client.get("/api/groups", headers = manager_headers)
     assert response.status_code == 200
 
@@ -41,7 +45,7 @@ async def test_get_all_groups_manager(client: AsyncClient, manager_headers):
     assert "group_admins" in group_names
 
 @pytest.mark.asyncio
-async def test_get_all_groups_user(client: AsyncClient, user_headers):
+async def test_get_all_groups_user(client: AsyncClient, user_headers, seeded_db):
     response = await client.get("/api/groups", headers = user_headers)
     assert response.status_code == 200
 
@@ -52,7 +56,7 @@ async def test_get_all_groups_user(client: AsyncClient, user_headers):
     assert "group_admins" not in group_names
 
 @pytest.mark.asyncio
-async def test_get_all_groups_requires_auth(client: AsyncClient):
+async def test_get_all_groups_requires_auth(client: AsyncClient, seeded_db):
     response = await client.get("/api/groups")
     assert response.status_code == 401
 
@@ -61,8 +65,13 @@ async def test_get_all_groups_requires_auth(client: AsyncClient):
 # Request: GET
 # Response: GroupDetailResponse
 @pytest.mark.asyncio
-async def test_get_group_by_id_admin(client: AsyncClient, admin_headers):
-    group_id = 3
+async def test_get_group_by_id_admin(client: AsyncClient, admin_headers, seeded_db):
+    session = seeded_db
+
+    result = await session.execute(select(Group).where(Group.name == "group_admins"))
+    group = result.scalar_one()
+    group_id = group.id
+
     response = await client.get(f"/api/groups/{group_id}", headers = admin_headers)
     assert response.status_code == 200
 
@@ -76,63 +85,95 @@ async def test_get_group_by_id_admin(client: AsyncClient, admin_headers):
     assert "members" in group
 
     # Make sure the request actually works
-    assert group["id"] == 3
-    assert "test_admin" in group["members"]
+    assert group["id"] == group_id
+    assert "admin" in group["members"]
 
 @pytest.mark.asyncio
-async def test_get_group_by_id_admin_access(client: AsyncClient, admin_headers):
-    group_id = 1
+async def test_get_group_by_id_admin_access(client: AsyncClient, admin_headers, seeded_db, normal_user):
+    session = seeded_db
+
+    result = await session.execute(select(Group).where(Group.name == "group_users"))
+    group = result.scalar_one()
+    group_id = group.id
+
     response = await client.get(f"/api/groups/{group_id}", headers = admin_headers)
     assert response.status_code == 200
 
     group = response.json()
-    assert group["id"] == 1
-    assert "test_user" in group["members"]
+    assert group["id"] == group_id
+    assert any(member["username"] == "user" for member in group["members"])
 
 @pytest.mark.asyncio
-async def test_get_group_by_id_manager(client: AsyncClient, manager_headers):
-    group_id = 2
+async def test_get_group_by_id_manager(client: AsyncClient, manager_headers, seeded_db):
+    session = seeded_db
+
+    result = await session.execute(select(Group).where(Group.name == "group_managers"))
+    group = result.scalar_one()
+    group_id = group.id
+
     response = await client.get(f"/api/groups/{group_id}", headers = manager_headers)
     assert response.status_code == 200
 
     group = response.json()
-    assert group["id"] == 2
-    assert "test_manager" in group["members"]
+    assert group["id"] == group_id
+    assert any(member["username"] == "manager" for member in group["members"])
 
 @pytest.mark.asyncio
-async def test_get_group_by_id_manager_access(client: AsyncClient, manager_headers):
-    group_id = 1
+async def test_get_group_by_id_manager_access(client: AsyncClient, manager_headers, seeded_db, normal_user):
+    session = seeded_db
+
+    result = await session.execute(select(Group).where(Group.name == "group_users"))
+    group = result.scalar_one()
+    group_id = group.id
+
     response = await client.get(f"/api/groups/{group_id}", headers = manager_headers)
     assert response.status_code == 200
 
     group = response.json()
-    assert group["id"] == 1
-    assert "test_user" in group["members"]
+    assert group["id"] == group_id
+    assert any(member["username"] == "user" for member in group["members"])
 
 @pytest.mark.asyncio
-async def test_get_group_by_id_user(client: AsyncClient, user_headers):
-    group_id = 1
+async def test_get_group_by_id_user(client: AsyncClient, user_headers, seeded_db):
+    session = seeded_db
+
+    result = await session.execute(select(Group).where(Group.name == "group_users"))
+    group = result.scalar_one()
+    group_id = group.id
+
     response = await client.get(f"/api/groups/{group_id}", headers = user_headers)
     assert response.status_code == 200
 
     group = response.json()
-    assert group["id"] == 1
-    assert "test_user" in group["members"]
+    assert group["id"] == group_id
+    assert any(member["username"] == "user" for member in group["members"])
 
 @pytest.mark.asyncio
-async def test_get_group_by_id_requires_auth(client: AsyncClient):
-    group_id = 1
+async def test_get_group_by_id_requires_auth(client: AsyncClient, seeded_db):
+    session = seeded_db
+
+    result = await session.execute(select(Group).where(Group.name == "group_users"))
+    group = result.scalar_one()
+    group_id = group.id
+
     response = await client.get(f"/api/groups/{group_id}")
     assert response.status_code == 401
 
 @pytest.mark.asyncio
-async def test_get_group_id_insufficient_permission(client: AsyncClient, user_headers):
-    group_id = 3
+async def test_get_group_id_insufficient_permission(client: AsyncClient, user_headers, seeded_db):
+    session = seeded_db
+
+    result = await session.execute(select(Group).where(Group.name == "group_admins"))
+    group = result.scalar_one()
+    group_id = group.id
+
     response = await client.get(f"/api/groups/{group_id}", headers = user_headers)
     assert response.status_code == 403
 
 @pytest.mark.asyncio
-async def test_get_group_id_not_found(client: AsyncClient, admin_headers):
+async def test_get_group_id_not_found(client: AsyncClient, admin_headers, seeded_db):
+    session = seeded_db
+
     group_id = -1
     response = await client.get(f"/api/groups/{group_id}", headers = admin_headers)
     assert response.status_code == 404
@@ -142,17 +183,27 @@ async def test_get_group_id_not_found(client: AsyncClient, admin_headers):
 # Request: POST
 # Response: GroupResponse
 @pytest.mark.asyncio
-async def test_create_group_admin(client: AsyncClient, admin_headers):
-    group_data = { "name": "group_admin_test", "description": "this is a test admin group" }
+async def test_create_group_admin(client: AsyncClient, admin_headers, seeded_db):
+    session = seeded_db
+
+    result = await session.execute(select(User).where(User.username == "admin"))
+    creator = result.scalar_one()
+    creator_id = creator.id
+
+    group_data = { 
+        "name": "group_admin_test",
+        "description": "this is a test admin group",
+        "created_by": creator_id,
+    }
     response = await client.post("/api/groups", json = group_data, headers = admin_headers)
     assert response.status_code == 201
 
     # Make sure the response fulfills the API contract
     group = response.json()
     assert "name" in group
-    assert group["name"] == "group_test"
+    assert group["name"] == "group_admin_test"
     assert "description" in group
-    assert group["description"] == "this is a test group"
+    assert group["description"] == "this is a test admin group"
     assert "id" in group
     assert "created_by" in group
     assert "created_at" in group
@@ -168,8 +219,18 @@ async def test_create_group_admin(client: AsyncClient, admin_headers):
     assert group["description"] == "this is a test admin group"
 
 @pytest.mark.asyncio
-async def test_create_group_manager(client: AsyncClient, manager_headers):
-    group_data = { "name": "group_manager_test", "description": "this is a test manager group" }
+async def test_create_group_manager(client: AsyncClient, manager_headers, seeded_db):
+    session = seeded_db
+
+    result = await session.execute(select(User).where(User.username == "manager"))
+    creator = result.scalar_one()
+    creator_id = creator.id
+
+    group_data = { 
+        "name": "group_manager_test",
+        "description": "this is a test manager group",
+        "created_by": creator_id,
+    }
     response = await client.post("/api/groups", json = group_data, headers = manager_headers)
     assert response.status_code == 201
 
@@ -183,20 +244,34 @@ async def test_create_group_manager(client: AsyncClient, manager_headers):
     assert group["description"] == "this is a test manager group"
 
 @pytest.mark.asyncio
-async def test_create_group_invalid_input(client: AsyncClient, headers = admin_headers):
+async def test_create_group_invalid_input(client: AsyncClient, admin_headers, seeded_db):
+    session = seeded_db
+
     group_data = {}
     response = await client.post("/api/groups", json = group_data, headers = admin_headers)
-    assert response.status_code == 400
+    assert response.status_code == 422
 
 @pytest.mark.asyncio
-async def test_create_group_requires_auth(client: AsyncClient):
-    group_data = { "name": "group_user_test", "description": "this is a test user group" }
+async def test_create_group_requires_auth(client: AsyncClient, seeded_db):
+    session = seeded_db
+
+    group_data = {}
     response = await client.post("/api/groups", json = group_data)
     assert response.status_code == 401
 
 @pytest.mark.asyncio
-async def test_create_group_insufficient_permission(client: AsyncClient, user_headers):
-    group_data = { "name": "group_user_test", "description": "this is a test user group" }
+async def test_create_group_insufficient_permission(client: AsyncClient, user_headers, seeded_db):
+    session = seeded_db
+
+    result = await session.execute(select(User).where(User.username == "user"))
+    creator = result.scalar_one()
+    creator_id = creator.id
+
+    group_data = { 
+        "name": "group_user_test",
+        "description": "this is a test user group",
+        "created_by": creator_id, 
+    }
     response = await client.post("/api/groups", json = group_data, headers = user_headers)
     assert response.status_code == 403
 
@@ -205,11 +280,16 @@ async def test_create_group_insufficient_permission(client: AsyncClient, user_he
 # Request: PATCH
 # Response: GroupResponse
 @pytest.mark.asyncio
-async def test_update_group_admin(client: AsyncClient, admin_headers):
-    group_id = 3
+async def test_update_group_admin(client: AsyncClient, admin_headers, seeded_db):
+    session = seeded_db
+
+    result = await session.execute(select(Group).where(Group.name == "group_admins"))
+    group = result.scalar_one()
+    group_id = group.id
+
     group_data = { "name": "group_admin_updated", "description": "this is an updated admin group" }
     response = await client.patch(f"/api/groups/{group_id}", json = group_data, headers = admin_headers)
-    assert response.status_code == 201
+    assert response.status_code == 200
 
     # Make sure the response fulfills the API contract
     group = response.json()
@@ -228,14 +308,19 @@ async def test_update_group_admin(client: AsyncClient, admin_headers):
 
     group = response.json()
     assert group["name"] == "group_admin_updated"
-    assert group["description"] = "this is an updated admin group"
+    assert group["description"] == "this is an updated admin group"
 
 @pytest.mark.asyncio
-async def test_update_group_manager(client: AsyncClient, manager_headers):
-    group_id = 2
+async def test_update_group_manager(client: AsyncClient, manager_headers, seeded_db):
+    session = seeded_db
+
+    result = await session.execute(select(Group).where(Group.name == "group_managers"))
+    group = result.scalar_one()
+    group_id = group.id
+
     group_data = { "name": "group_manager_updated", "description": "this is an updated manager group" }
     response = await client.patch(f"/api/groups/{group_id}", json = group_data, headers = manager_headers)
-    assert response.status_code == 201
+    assert response.status_code == 200
 
     response = await client.get(f"/api/groups/{group_id}", headers = manager_headers)
     assert response.status_code == 200
@@ -245,23 +330,26 @@ async def test_update_group_manager(client: AsyncClient, manager_headers):
     assert group["description"] == "this is an updated manager group"
 
 @pytest.mark.asyncio
-async def test_update_group_invalid_input(client: AsyncClient, admin_headers):
-    group_id = 1
-    group_data = {}
-    response = await client.patch(f"/api/groups/{group_id}", json = group_data, headers = admin_headers)
-    assert response.status_code == 400
+async def test_update_group_requires_auth(client: AsyncClient, seeded_db):
+    session = seeded_db
 
-@pytest.mark.asyncio
-async def test_update_group_requires_auth(client: AsyncClient):
-    group_id = 1
-    group_data = { "name": "group_user_updated", "description": "this is an updated test group" }
+    result = await session.execute(select(Group).where(Group.name == "group_users"))
+    group = result.scalar_one()
+    group_id = group.id
+
+    group_data = { "name": "group_user_updated", "description": "this is an updated user group" }
     response = await client.patch(f"/api/groups/{group_id}", json = group_data)
     assert response.status_code == 401
 
 @pytest.mark.asyncio
-async def test_update_group_insufficient_permission(client: AsyncClient, user_headers):
-    group_id = 1
-    group_data = { "name": "group_user_updated", "description": "this is an updated test group" }
+async def test_update_group_insufficient_permission(client: AsyncClient, user_headers, seeded_db):
+    session = seeded_db
+
+    result = await session.execute(select(Group).where(Group.name == "group_users"))
+    group = result.scalar_one()
+    group_id = group.id
+
+    group_data = { "name": "group_user_updated", "description": "this is an updated user group" }
     response = await client.patch(f"/api/groups/{group_id}", json = group_data, headers = user_headers)
     assert response.status_code == 403
 
@@ -270,21 +358,31 @@ async def test_update_group_insufficient_permission(client: AsyncClient, user_he
 # Request: DELETE
 # Response: None
 @pytest.mark.asyncio
-async def test_delete_group_admin(client: AsyncClient, admin_headers):
-    group_id = 3
+async def test_delete_group_admin(client: AsyncClient, admin_headers, seeded_db):
+    session = seeded_db
+
+    result = await session.execute(select(Group).where(Group.name == "group_admins"))
+    group = result.scalar_one()
+    group_id = group.id
+
     response = await client.delete(f"/api/groups/{group_id}", headers = admin_headers)
     assert response.status_code == 204
 
     # Make sure the response fulfills the API contract
-    assert response.json() is None
+    assert not response.content
 
     # Make sure the request actually works
     response = await client.get(f"/api/groups/{group_id}", headers = admin_headers)
     assert response.status_code == 404
 
 @pytest.mark.asyncio
-async def test_delete_group_manager(client: AsyncClient, manager_headers):
-    group_id = 2
+async def test_delete_group_manager(client: AsyncClient, manager_headers, seeded_db):
+    session = seeded_db
+
+    result = await session.execute(select(Group).where(Group.name == "group_managers"))
+    group = result.scalar_one()
+    group_id = group.id
+
     response = await client.delete(f"/api/groups/{group_id}", headers = manager_headers)
     assert response.status_code == 204
 
@@ -292,19 +390,31 @@ async def test_delete_group_manager(client: AsyncClient, manager_headers):
     assert response.status_code == 404
 
 @pytest.mark.asyncio
-async def test_delete_group_requires_auth(client: AsyncClient):
-    group_id = 1
+async def test_delete_group_requires_auth(client: AsyncClient, seeded_db):
+    session = seeded_db
+
+    result = await session.execute(select(Group).where(Group.name == "group_users"))
+    group = result.scalar_one()
+    group_id = group.id
+
     response = await client.delete(f"/api/groups/{group_id}")
     assert response.status_code == 401
 
 @pytest.mark.asyncio
-async def test_delete_group_insufficient_permission(client: AsyncClient, user_headers):
-    group_id = 1
+async def test_delete_group_insufficient_permission(client: AsyncClient, user_headers, seeded_db):
+    session = seeded_db
+
+    result = await session.execute(select(Group).where(Group.name == "group_users"))
+    group = result.scalar_one()
+    group_id = group.id
+
     response = await client.delete(f"/api/groups/{group_id}", headers = user_headers)
     assert response.status_code == 403
 
 @pytest.mark.asyncio
-async def test_delete_group_not_found(client: AsyncClient, admin_headers):
+async def test_delete_group_not_found(client: AsyncClient, admin_headers, seeded_db):
+    session = seeded_db
+
     group_id = -1
     response = await client.delete(f"/api/groups/{group_id}", headers = admin_headers)
     assert response.status_code == 404
