@@ -3,17 +3,19 @@ Pytest fixtures for testing the group schema
 """
 
 import pytest
-
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import sessionmaker, joinedload
 from sqlalchemy.future import select
+from sqlalchemy.orm import joinedload, sessionmaker
 
-from models import Base, Role, User, Group, UserGroup
+from models import Group, Role, User, UserGroup
 from server import app
+
 
 @pytest.fixture(scope="function")
 async def seeded_db(test_db):
-    TestSessionLocal = sessionmaker(test_db, class_=AsyncSession, expire_on_commit=False)
+    TestSessionLocal = sessionmaker(
+        test_db, class_=AsyncSession, expire_on_commit=False
+    )
 
     # Seed required roles
     async with TestSessionLocal() as session:
@@ -43,7 +45,7 @@ async def seeded_db(test_db):
         for group in groups:
             session.add(group)
         await session.commit()
-    
+
         yield session
 
 
@@ -74,9 +76,9 @@ async def admin_user(seeded_db):
 
     # Add admin to group
     membership = UserGroup(
-        user_id = admin.id,
-        group_id = group.id,
-        role = "member",
+        user_id=admin.id,
+        group_id=group.id,
+        role="member",
     )
     session.add(membership)
     await session.commit()
@@ -139,9 +141,9 @@ async def manager_user(seeded_db):
 
     # Add manager to group
     membership = UserGroup(
-        user_id = manager.id,
-        group_id = group.id,
-        role = "member",
+        user_id=manager.id,
+        group_id=group.id,
+        role="member",
     )
     session.add(membership)
     await session.commit()
@@ -204,9 +206,9 @@ async def normal_user(seeded_db):
 
     # Add user to group
     membership = UserGroup(
-        user_id = user.id,
-        group_id = group.id,
-        role = "member",
+        user_id=user.id,
+        group_id=group.id,
+        role="member",
     )
     session.add(membership)
     await session.commit()
