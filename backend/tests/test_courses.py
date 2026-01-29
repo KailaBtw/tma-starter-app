@@ -19,6 +19,30 @@ Fixtures used (from tests/conftest.py):
 
 import pytest
 from httpx import AsyncClient
+from models import Course
+from tests.conftest import TestSessionLocal
+
+###############################################################################
+# Test fixtures for course data
+###############################################################################
+
+@pytest.fixture
+async def test_course(test_db):
+    """
+    Create a test course in the database
+    
+    Use this fixture when you need an existing course for testing (e.g., GET /api/courses/1)
+    """
+    async with TestSessionLocal() as session:
+        course = Course(
+            title="suauce",
+            description="bruh bruh bruh",
+        )
+        session.add(course)
+        await session.commit()
+        await session.refresh(course)
+        return course
+
 
 ###############################################################################
 # GET - get_all_courses tests
@@ -59,7 +83,7 @@ async def test_get_all_courses_success(client: AsyncClient, auth_headers, admin_
     assert isinstance(data, list)
     
 @pytest.mark.asyncio
-async def test_get_all_courses_not_empty(client: AsyncClient, auth_headers, admin_user):
+async def test_get_all_courses_not_empty(client: AsyncClient, auth_headers, admin_user, test_course):
     """
     Test that GET /api/courses returns *non-empty* list when courses exist
 
@@ -83,7 +107,7 @@ async def test_get_all_courses_not_empty(client: AsyncClient, auth_headers, admi
     # Assert: First item should have expected fields
     first_course = data[0]
     assert "id" in first_course
-    assert "name" in first_course
+    assert "title" in first_course
     assert "description" in first_course
     assert "created_at" in first_course
     assert "updated_at" in first_course
@@ -130,7 +154,7 @@ async def test_get_course_by_id_not_found(client: AsyncClient, auth_headers):
 
 
 @pytest.mark.asyncio
-async def test_get_course_by_id_success(client: AsyncClient, auth_headers):
+async def test_get_course_by_id_success(client: AsyncClient, auth_headers, test_course):
     """
     Test that GET /api/courses/{id} returns course details when authenticated
 
@@ -138,16 +162,18 @@ async def test_get_course_by_id_success(client: AsyncClient, auth_headers):
     - Status: 200 OK
     - Response: Course object with expected fields
     """
-    # Act: Request a course ID that exists (assuming here that a course with ID of 1 exists in DB)
-    response = await client.get("/api/courses/1", headers=auth_headers)
+    # Act: Request a course ID that exists
+    response = await client.get(f"/api/courses/{test_course.id}", headers=auth_headers)
     
     # Assert: Should return 200 OK
     assert response.status_code == 200
     
     # Assert: Response should be a course object with expected fields
     data = response.json()
+    assert data["id"] == test_course.id
+    assert data["title"] == test_course.title
     assert "id" in data
-    assert "name" in data
+    assert "title" in data
     assert "description" in data
     assert "created_at" in data
     assert "updated_at" in data
@@ -168,7 +194,7 @@ async def test_create_course_needs_auth(client: AsyncClient):
     """
     # Arrange: Prepare course data valid format
     course_data = {
-        "name": "Suauce",
+        "title": "Suauce",
         "description": "Bruh Bruh Bruh",
         # I think (hope) created_at and updated_at are auto seeded by backend???
         # Todo: add more fields as needed
@@ -193,7 +219,7 @@ async def test_create_course_invalid_input(client: AsyncClient, auth_headers, ad
     Note: Even with authentication, invalid data should be rejected
     """
     course_data = {
-        # "name" is missing
+        # "title" is missing
         "description": "Bruh Bruh Bruh",
     }
     
@@ -219,7 +245,7 @@ async def test_create_course_success(client: AsyncClient, auth_headers, test_db,
     Note: test_db fixture ensures fresh database for each test
     """
     course_data = {
-        "name": "Suauce",
+        "title": "Suauce",
         "description": "Bruh Bruh Bruh",
         # I think (hope) created_at and updated_at are auto seeded by backend???
         # Todo: add more fields as needed
@@ -236,7 +262,7 @@ async def test_create_course_success(client: AsyncClient, auth_headers, test_db,
     # Assert: Response should contain course object with id
     data = response.json()
     assert "id" in data
-    assert data["name"] == course_data["name"]
+    assert data["title"] == course_data["title"]
     assert data["description"] == course_data["description"]
     assert data["created_at"] is not None
     assert data["updated_at"] is not None
@@ -254,7 +280,7 @@ async def test_create_course_success(client: AsyncClient, auth_headers, test_db,
     # Assert: Retrieved course should match created data
     get_data = get_response.json()
     assert get_data["id"] == created_course_id
-    assert get_data["name"] == course_data["name"]
+    assert get_data["title"] == course_data["title"]
     assert get_data["description"] == course_data["description"]
     assert get_data["created_at"] is not None
     assert get_data["updated_at"] is not None
@@ -273,7 +299,7 @@ async def test_update_course_requires_auth(client: AsyncClient):
     Updating courses requires admin privileges, so authentication is mandatory.
     """
     # Act: Make request without authentication headers
-    response = await client.patch("/api/courses/1", json={"name": "Bruh New"})
+    response = await client.patch("/api/courses/1", json={"title": "Bruh New"})
     
     # Assert: Should return 401 Unauthorized
     assert response.status_code == 401
@@ -290,7 +316,7 @@ async def test_update_course_not_found(client: AsyncClient, auth_headers, admin_
     """
     # Act: Make authenticated request to update non-existent course
     response = await client.patch(
-        "/api/courses/99999", json={"name": "Bruh New"}, headers=auth_headers
+        "/api/courses/99999", json={"title": "Bruh New"}, headers=auth_headers
     )
 
     # Assert: Should return 404 Not Found
@@ -298,7 +324,7 @@ async def test_update_course_not_found(client: AsyncClient, auth_headers, admin_
 
 
 @pytest.mark.asyncio
-async def test_update_course_success(client: AsyncClient, auth_headers, admin_user):
+async def test_update_course_success(client: AsyncClient, auth_headers, admin_user, test_course):
     """
     Test that PATCH /api/courses/{id} updates a course successfully
 
@@ -309,13 +335,13 @@ async def test_update_course_success(client: AsyncClient, auth_headers, admin_us
     """
     # Arrange: Prepare update data
     updated_data = {
-        "name": "New Suauce",
+        "title": "New Suauce",
         "description": "Bruh Bruh Bruh but better",
     }
 
-    # Act: Make authenticated request to update existing course (assuming ID 1 exists)
+    # Act: Make authenticated request to update existing course
     response = await client.patch(
-        "/api/courses/1", json=updated_data, headers=auth_headers
+        f"/api/courses/{test_course.id}", json=updated_data, headers=auth_headers
     )
 
     # Assert: Should return 200 OK
@@ -323,23 +349,23 @@ async def test_update_course_success(client: AsyncClient, auth_headers, admin_us
 
     # Assert: Response should contain updated course object
     data = response.json()
-    assert data["id"] == 1
-    assert data["name"] == updated_data["name"]
+    assert data["id"] == test_course.id
+    assert data["title"] == updated_data["title"]
     assert data["description"] == updated_data["description"]
     assert data["created_at"] is not None
     assert data["updated_at"] is not None
     # Todo: Add more field checks as needed
 
     # Act: Retrieve the updated course via GET
-    get_response = await client.get("/api/courses/1", headers=auth_headers)
+    get_response = await client.get(f"/api/courses/{test_course.id}", headers=auth_headers)
 
     # Assert: GET should return 200 OK
     assert get_response.status_code == 200
 
     # Assert: Retrieved course should reflect updates
     get_data = get_response.json()
-    assert get_data["id"] == 1
-    assert get_data["name"] == updated_data["name"]
+    assert get_data["id"] == test_course.id
+    assert get_data["title"] == updated_data["title"]
     assert get_data["description"] == updated_data["description"]
     assert get_data["created_at"] is not None
     assert get_data["updated_at"] is not None
@@ -382,7 +408,7 @@ async def test_delete_course_not_found(client: AsyncClient, auth_headers, admin_
 
 
 @pytest.mark.asyncio
-async def test_delete_course_success(client: AsyncClient, auth_headers, admin_user):
+async def test_delete_course_success(client: AsyncClient, auth_headers, admin_user, test_course):
     """
     Test that DELETE /api/courses/{id} deletes a course successfully
 
@@ -390,9 +416,9 @@ async def test_delete_course_success(client: AsyncClient, auth_headers, admin_us
     - Status: 204 No Content
     - Course should no longer be retrievable via GET
     """
-    # Act: Make authenticated request to delete existing course (assuming ID 1 exists)
+    # Act: Make authenticated request to delete existing course
     response = await client.delete(
-        "/api/courses/1", headers=auth_headers
+        f"/api/courses/{test_course.id}", headers=auth_headers
     )
     
     # Assert: Should return 204 No Content
