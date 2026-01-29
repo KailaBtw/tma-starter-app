@@ -19,6 +19,7 @@ Fixtures used (from tests/conftest.py):
 
 import pytest
 from httpx import AsyncClient
+
 from models import Course
 from tests.conftest import TestSessionLocal
 
@@ -26,11 +27,12 @@ from tests.conftest import TestSessionLocal
 # Test fixtures for course data
 ###############################################################################
 
+
 @pytest.fixture
 async def test_course(test_db):
     """
     Create a test course in the database
-    
+
     Use this fixture when you need an existing course for testing (e.g., GET /api/courses/1)
     """
     async with TestSessionLocal() as session:
@@ -47,6 +49,7 @@ async def test_course(test_db):
 ###############################################################################
 # GET - get_all_courses tests
 ###############################################################################
+
 
 @pytest.mark.asyncio
 async def test_get_all_courses_needs_auth(client: AsyncClient):
@@ -81,9 +84,12 @@ async def test_get_all_courses_success(client: AsyncClient, auth_headers, admin_
     # Assert: Response should be a list
     data = response.json()
     assert isinstance(data, list)
-    
+
+
 @pytest.mark.asyncio
-async def test_get_all_courses_not_empty(client: AsyncClient, auth_headers, admin_user, test_course):
+async def test_get_all_courses_not_empty(
+    client: AsyncClient, auth_headers, admin_user, test_course
+):
     """
     Test that GET /api/courses returns *non-empty* list when courses exist
 
@@ -100,10 +106,10 @@ async def test_get_all_courses_not_empty(client: AsyncClient, auth_headers, admi
     # Assert: Response should be a list
     data = response.json()
     assert isinstance(data, list)
-    
+
     # Assert: List should not be empty
     assert len(data) > 0
-    
+
     # Assert: First item should have expected fields
     first_course = data[0]
     assert "id" in first_course
@@ -112,11 +118,12 @@ async def test_get_all_courses_not_empty(client: AsyncClient, auth_headers, admi
     assert "created_at" in first_course
     assert "updated_at" in first_course
     # Todo: Add more field checks as needed
-    
-    
+
+
 ###############################################################################
 # GET - get_course tests
 ###############################################################################
+
 
 @pytest.mark.asyncio
 async def test_get_course_by_id_needs_auth(client: AsyncClient):
@@ -164,10 +171,10 @@ async def test_get_course_by_id_success(client: AsyncClient, auth_headers, test_
     """
     # Act: Request a course ID that exists
     response = await client.get(f"/api/courses/{test_course.id}", headers=auth_headers)
-    
+
     # Assert: Should return 200 OK
     assert response.status_code == 200
-    
+
     # Assert: Response should be a course object with expected fields
     data = response.json()
     assert data["id"] == test_course.id
@@ -178,11 +185,12 @@ async def test_get_course_by_id_success(client: AsyncClient, auth_headers, test_
     assert "created_at" in data
     assert "updated_at" in data
     # Todo: Add more field checks as needed
-    
+
 
 ###############################################################################
 # POST - create_course tests
 ###############################################################################
+
 
 @pytest.mark.asyncio
 async def test_create_course_needs_auth(client: AsyncClient):
@@ -208,7 +216,9 @@ async def test_create_course_needs_auth(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_create_course_invalid_input(client: AsyncClient, auth_headers, admin_user):
+async def test_create_course_invalid_input(
+    client: AsyncClient, auth_headers, admin_user
+):
     """
     Test that POST /api/courses returns 422 for missing required fields
 
@@ -222,18 +232,18 @@ async def test_create_course_invalid_input(client: AsyncClient, auth_headers, ad
         # "title" is missing
         "description": "Bruh Bruh Bruh",
     }
-    
+
     # Act: Make authenticated request with input
-    response = await client.post(
-        "/api/courses", json=course_data, headers=auth_headers
-    )
+    response = await client.post("/api/courses", json=course_data, headers=auth_headers)
 
     # Assert: Should return 422 Unprocessable Entity
     assert response.status_code == 422
 
 
 @pytest.mark.asyncio
-async def test_create_course_success(client: AsyncClient, auth_headers, test_db, admin_user):
+async def test_create_course_success(
+    client: AsyncClient, auth_headers, test_db, admin_user
+):
     """
     Test that POST /api/courses creates a course successfully
 
@@ -252,9 +262,7 @@ async def test_create_course_success(client: AsyncClient, auth_headers, test_db,
     }
 
     # Act: Make authenticated request to create course
-    response = await client.post(
-        "/api/courses", json=course_data, headers=auth_headers
-    )
+    response = await client.post("/api/courses", json=course_data, headers=auth_headers)
 
     # Assert: Should return 201 Created
     assert response.status_code == 201
@@ -290,6 +298,7 @@ async def test_create_course_success(client: AsyncClient, auth_headers, test_db,
 # PATCH - update_course tests
 ###############################################################################
 
+
 @pytest.mark.asyncio
 async def test_update_course_requires_auth(client: AsyncClient):
     """
@@ -300,7 +309,7 @@ async def test_update_course_requires_auth(client: AsyncClient):
     """
     # Act: Make request without authentication headers
     response = await client.patch("/api/courses/1", json={"title": "Bruh New"})
-    
+
     # Assert: Should return 401 Unauthorized
     assert response.status_code == 401
 
@@ -324,7 +333,9 @@ async def test_update_course_not_found(client: AsyncClient, auth_headers, admin_
 
 
 @pytest.mark.asyncio
-async def test_update_course_success(client: AsyncClient, auth_headers, admin_user, test_course):
+async def test_update_course_success(
+    client: AsyncClient, auth_headers, admin_user, test_course
+):
     """
     Test that PATCH /api/courses/{id} updates a course successfully
 
@@ -357,7 +368,9 @@ async def test_update_course_success(client: AsyncClient, auth_headers, admin_us
     # Todo: Add more field checks as needed
 
     # Act: Retrieve the updated course via GET
-    get_response = await client.get(f"/api/courses/{test_course.id}", headers=auth_headers)
+    get_response = await client.get(
+        f"/api/courses/{test_course.id}", headers=auth_headers
+    )
 
     # Assert: GET should return 200 OK
     assert get_response.status_code == 200
@@ -370,9 +383,11 @@ async def test_update_course_success(client: AsyncClient, auth_headers, admin_us
     assert get_data["created_at"] is not None
     assert get_data["updated_at"] is not None
 
+
 ###############################################################################
 # DELETE - delete_course tests
 ###############################################################################
+
 
 @pytest.mark.asyncio
 async def test_delete_course_requires_auth(client: AsyncClient):
@@ -384,7 +399,7 @@ async def test_delete_course_requires_auth(client: AsyncClient):
     """
     # Act: Make request without authentication headers
     response = await client.delete("/api/courses/1")
-    
+
     # Assert: Should return 401 Unauthorized
     assert response.status_code == 401
 
@@ -399,16 +414,16 @@ async def test_delete_course_not_found(client: AsyncClient, auth_headers, admin_
     - Response: Error message indicating course not found
     """
     # Act: Make authenticated request to delete non-existent course
-    response = await client.delete(
-        "/api/courses/99999", headers=auth_headers
-    )
+    response = await client.delete("/api/courses/99999", headers=auth_headers)
 
     # Assert: Should return 404 Not Found
     assert response.status_code == 404
 
 
 @pytest.mark.asyncio
-async def test_delete_course_success(client: AsyncClient, auth_headers, admin_user, test_course):
+async def test_delete_course_success(
+    client: AsyncClient, auth_headers, admin_user, test_course
+):
     """
     Test that DELETE /api/courses/{id} deletes a course successfully
 
@@ -420,6 +435,6 @@ async def test_delete_course_success(client: AsyncClient, auth_headers, admin_us
     response = await client.delete(
         f"/api/courses/{test_course.id}", headers=auth_headers
     )
-    
+
     # Assert: Should return 204 No Content
     assert response.status_code == 204
