@@ -5,8 +5,6 @@ Contract-level tests for the /api/users endpoint
 import pytest
 from httpx import AsyncClient
 
-from models import Base, Role, User
-
 
 # List all users (DONE)
 # Route: /api/users
