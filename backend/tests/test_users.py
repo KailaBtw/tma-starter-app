@@ -220,7 +220,7 @@ async def test_update_user_id_not_found(client: AsyncClient, auth_headers):
 # Request: DELETE
 @pytest.mark.asyncio
 async def test_delete_user_self_not_allowed(client: AsyncClient, auth_headers):
-    response = await client.delete(f"/api/users/1", headers=auth_headers)
+    response = await client.delete("/api/users/1", headers=auth_headers)
     assert response.status_code == 400
 
 
