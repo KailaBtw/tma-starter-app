@@ -28,6 +28,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 # Security scheme for Swagger UI
 security_scheme = HTTPBearer()
+optional_bearer = HTTPBearer(auto_error=False)
 
 
 def _prehash_password(password: str) -> bytes:
@@ -185,6 +186,41 @@ async def get_current_user(
         raise credentials_exception
 
     return authenticated_user
+
+
+async def get_bearer_token_optional(
+    credentials: HTTPAuthorizationCredentials | None = Security(optional_bearer),
+) -> str | None:
+    """Extract Bearer token from Authorization header if present."""
+    if credentials is None:
+        return None
+    return credentials.credentials
+
+
+async def get_current_user_optional(
+    token: str | None = Depends(get_bearer_token_optional),
+    db: AsyncSession = Depends(get_db),
+) -> User | None:
+    """
+    Get the current user from JWT if present and valid; otherwise None.
+    Use for endpoints that work both authenticated and anonymous (e.g. register).
+    """
+    if token is None:
+        return None
+    from sqlalchemy.orm import joinedload
+
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            return None
+    except JWTError:
+        return None
+
+    result = await db.execute(
+        select(User).where(User.username == username).options(joinedload(User.role))
+    )
+    return result.scalar_one_or_none()
 
 
 async def get_current_active_user(

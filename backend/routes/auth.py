@@ -15,6 +15,7 @@ from auth import (
     authenticate_user,
     create_access_token,
     get_current_active_user,
+    get_current_user_optional,
     get_password_hash,
     get_user_by_email,
     get_user_by_id,
@@ -41,7 +42,11 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 @router.post("/register", response_model=UserResponse, status_code=201)
-async def register(user_data: UserCreate, db: AsyncSession = Depends(get_db)):
+async def register(
+    user_data: UserCreate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User | None = Depends(get_current_user_optional),
+):
     """
     Register a new user.
 
@@ -82,6 +87,17 @@ async def register(user_data: UserCreate, db: AsyncSession = Depends(get_db)):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid role. Must be one of: {', '.join(valid_roles)}",
         )
+
+    if role_name in ("admin", "manager"):
+        if (
+            current_user is None
+            or current_user.role is None
+            or current_user.role.name != "admin"
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Only admins can create accounts with admin or manager role.",
+            )
 
     # Get role from database
     role_result = await db.execute(select(Role).where(Role.name == role_name))
