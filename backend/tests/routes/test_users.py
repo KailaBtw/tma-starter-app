@@ -102,7 +102,6 @@ async def test_get_user_by_id_with_auth(client: AsyncClient, auth_headers, admin
     data = response.json()
     assert response.status_code == 200
 
-    #  What else needs to be added here?
     assert "id" in data
     assert "username" in data
     assert "email" in data
@@ -284,7 +283,7 @@ async def test_create_user_duplicate_username(
 # Route: /api/users/{id}
 # Request: PATCH
 @pytest.mark.asyncio
-async def test_update_user(client: AsyncClient, auth_headers):
+async def test_update_user_success(client: AsyncClient, auth_headers):
     # Update the user
     user_data = {
         "first_name": "walter",
@@ -327,6 +326,14 @@ async def test_update_user_id_not_found(client: AsyncClient, auth_headers):
     assert response.status_code == 404
     data = response.json()
     assert "not found" in data["detail"].lower()
+
+
+@pytest.mark.asyncio
+async def test_update_user_validation_error(client: AsyncClient, auth_headers):
+    response = await client.patch(
+        "/api/users/1", json={"first_name": 7}, headers=auth_headers
+    )
+    assert response.status_code == 422
 
 
 # Delete user
@@ -411,8 +418,19 @@ async def test_user_status_success(client: AsyncClient, auth_headers):
 
 @pytest.mark.asyncio
 async def test_update_user_status_id_not_found(client: AsyncClient, auth_headers):
-    response = await client.patch("/api/users/99999", json={}, headers=auth_headers)
+    payload = {"user_id": "1", "is_active": True}
+    response = await client.patch(
+        "/api/users/99999/status", json=payload, headers=auth_headers
+    )
     assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_update_user_status_validation_error(client: AsyncClient, auth_headers):
+    response = await client.patch(
+        "/api/users/1/status", json={"status": 7}, headers=auth_headers
+    )
+    assert response.status_code == 422
 
 
 # Update user role
@@ -420,7 +438,10 @@ async def test_update_user_status_id_not_found(client: AsyncClient, auth_headers
 # Request: PATCH
 @pytest.mark.asyncio
 async def test_update_user_role_id_not_found(client: AsyncClient, auth_headers):
-    response = await client.patch("/api/users/99999", json={}, headers=auth_headers)
+    payload = {"user_id": "1", "role": "manager"}
+    response = await client.patch(
+        "/api/users/99999/role", json=payload, headers=auth_headers
+    )
     assert response.status_code == 404
 
 
@@ -443,11 +464,11 @@ async def test_update_user_role_success(client: AsyncClient, auth_headers):
 
     # change the role
     payload = {"user_id": id, "role": "manager"}
-    response = await client.patch(
+    get_response = await client.patch(
         f"/api/users/{id}/role", json=payload, headers=auth_headers
     )
-    assert response.status_code == 200
-    data = response.json()
+    assert get_response.status_code == 200
+    data = get_response.json()
     # assert that the role has changed
     assert data["role"]["name"] == "manager"
 
@@ -455,3 +476,11 @@ async def test_update_user_role_success(client: AsyncClient, auth_headers):
     assert get_response2.status_code == 200
     data = get_response2.json()
     assert data["role"]["name"] == "manager"
+
+
+@pytest.mark.asyncio
+async def test_update_user_role_validation_error(client: AsyncClient, auth_headers):
+    response = await client.patch(
+        "/api/users/1/role", json={"role": 7}, headers=auth_headers
+    )
+    assert response.status_code == 422
