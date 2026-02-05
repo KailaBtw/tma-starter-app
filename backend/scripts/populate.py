@@ -1,3 +1,5 @@
+# flake8: noqa: F401
+
 """
 Seed script to populate the database with test users, groups, and courses.
 
@@ -31,9 +33,16 @@ from database.migrations import run_migrations, seed_initial_data  # noqa: E402
 # Import all models to ensure they're registered with Base.metadata
 from models import (  # noqa: E402
     Base,
+    CompletedUserItem,
     Course,
     CourseGroup,
+    CourseModule,
+    CourseUser,
     Group,
+    Module,
+    ModulePost,
+    Post,
+    PostContent,
     Role,
     User,
     UserGroup,
