@@ -3,7 +3,6 @@ Contract-level tests for the /api/courses endpoint
 
 These tests verify the API contract (behavior) from the client's perspective:
 - Status codes (200, 201, 404, 401, 422, etc.)
-    - Codes: 200 OK, 201 Created, 204 No Content, 400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found, 422 Unprocessable Entity
 - Response structure (JSON format, required fields)
 - Error messages (when things go wrong)
 - Authentication/Authorization (who can access what)
@@ -33,7 +32,6 @@ async def test_course(test_db):
     """
     Create a test course in the database
 
-    Use this fixture when you need an existing course for testing (e.g., GET /api/courses/1)
     """
     async with TestSessionLocal() as session:
         course = Course(
@@ -95,7 +93,6 @@ async def test_get_all_courses_not_empty(
 
     Contract: When courses exist in the system:
     - Status: 200 OK
-    - Response: Non-empty list of course objects, each with expected fields (only tests first item)
     """
     # Act: Make authenticated request
     response = await client.get("/api/courses", headers=auth_headers)
