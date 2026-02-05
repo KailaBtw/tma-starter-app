@@ -14,6 +14,7 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
+from auth import get_password_hash
 from database import get_db
 from models import Base, Role, User
 from server import app
@@ -154,6 +155,78 @@ async def admin_user(test_db):
         admin_with_role = result.scalar_one()
 
         yield admin_with_role  # Provide the user object to your test
+
+
+@pytest.fixture
+async def regular_user(test_db):
+    """
+    Create a regular user for testing
+
+    This fixture:
+    - Depends on test_db (so roles exist first)
+    - Creates a test user in the database
+    - Returns the user object with role relationship loaded
+
+    Use this when you need an authenticated admin user in your tests.
+    """
+    async with TestSessionLocal() as session:
+        from sqlalchemy.future import select
+        from sqlalchemy.orm import joinedload
+
+        # Get user role (already created by test_db fixture)
+        # We need to look it up because User requires a role_id foreign key
+        result = await session.execute(select(Role).where(Role.name == "user"))
+        user_role = result.scalar_one()
+
+        # Create user with test data
+        user = User(
+            username="user",
+            email="user@test.com",
+            # Dummy hash - we're not testing password hashing
+            hashed_password=get_password_hash("testpassword123"),
+            role_id=user_role.id,  # Link to the user role
+            is_active=True,
+        )
+        session.add(user)
+        await session.commit()
+        await session.refresh(user)  # Refresh to get the ID that was generated
+
+        # Load the role relationship (so user.role is available,
+        # not just user.role_id)
+        # joinedload() eagerly loads the relationship in the same query
+        result = await session.execute(
+            select(User).where(User.id == user.id).options(joinedload(User.role))
+        )
+        user_with_role = result.scalar_one()
+
+        yield user_with_role  # Provide the user object to your test
+
+
+@pytest.fixture
+async def regular_user_auth_headers(client, regular_user, test_db):
+    """
+    Auth headers that make the app treat the request as the regular (non-admin) user.
+
+    Overrides get_current_user_optional (for /auth/register) and get_current_user
+    (for routes like /auth/users/disable that use require_admin).
+    Use for tests that need "logged in as regular user"
+    (e.g. assert 403 when creating admin or calling admin-only endpoints with a user).
+    """
+    from auth import get_current_user, get_current_user_optional
+
+    async def override_get_current_user_optional():
+        return regular_user
+
+    async def override_get_current_user():
+        return regular_user
+
+    app.dependency_overrides[get_current_user_optional] = (
+        override_get_current_user_optional
+    )
+    app.dependency_overrides[get_current_user] = override_get_current_user
+    yield {"Authorization": "Bearer test-token"}
+    app.dependency_overrides.pop(get_current_user_optional, None)
+    app.dependency_overrides.pop(get_current_user, None)
 
 
 @pytest.fixture
