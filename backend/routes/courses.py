@@ -91,22 +91,29 @@ async def get_course(
     """
     Get a single course by ID. Modules will be implemented by students.
     """
-    result = await db.execute(select(Course).where(Course.id == course_id))
+    result = await db.execute(
+        select(Course)
+        .join(CourseGroup, Course.id == CourseGroup.course_id)
+        .where(Course.id == course_id)
+        .distinct()
+    )
     course = result.scalar_one_or_none()
+    
 
     if course is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Course not found"
         )
 
-    return {
-        "id": course.id,
-        "title": course.title,
-        "description": course.description,
-        "created_at": course.created_at,
-        "updated_at": course.updated_at,
-        "modules": [],  # Modules will be implemented by students
-    }
+    return course
+    # {
+    #     "id": course.id,
+    #     "title": course.title,
+    #     "description": course.description,
+    #     "created_at": course.created_at,
+    #     "updated_at": course.updated_at,
+    #     "modules": [],  # Modules will be implemented by students
+    # }
 
 
 @router.post(

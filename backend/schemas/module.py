@@ -22,9 +22,9 @@ class ModuleCreate(ModuleBase):
 
 class ModuleUpdate(BaseModel):
     """Schema for updating a module"""
+    # Title is required for create but optional for update.
 
     title: Optional[str] = None
-    description: Optional[str] = None
 
 
 class ModuleResponse(ModuleBase):
@@ -35,24 +35,15 @@ class ModuleResponse(ModuleBase):
     id: int
     created_at: datetime
     updated_at: datetime
-    module_count: int = 0
-
-
-class PostInModule(BaseModel):
-    """Post information included in module"""
-
-    model_config = ConfigDict(from_attributes=True)
-
-    post_id: int
-    post_title: str
-    post_description: Optional[str]
-    post_color: Optional[str] = None
-    ordering: int
+    # When the Post schema is implemented, can 
+    # make this smarter.
+    post_count: int = 0
 
 
 class ModuleDetailResponse(ModuleResponse):
     """Schema for module detail response with post"""
+    #TODO: This will eventually include a list of Posts associated
+    #with this module.
 
     model_config = ConfigDict(from_attributes=True)
 
-    posts: List[PostInModule] = []
