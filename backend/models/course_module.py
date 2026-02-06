@@ -14,7 +14,7 @@ class CourseModule(Base):
     id = Column(Integer, primary_key=True)
     course_id = Column(Integer, ForeignKey("courses.id"), nullable=False)
     module_id = Column(Integer, ForeignKey("modules.id"), nullable=False)
-    ordering = Column(Integer, default=0) # renamed "order" to "ordering" to avoid keyword error in SQL.
+    ordering = Column(Integer, default=0)
 
     created_at = Column(TIMESTAMP, default=datetime.utcnow)
     updated_at = Column(TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow)

@@ -4,9 +4,10 @@ Course Pydantic schemas for request/response validation
 
 from datetime import datetime
 from typing import List, Optional
-from schemas.module import ModuleResponse
 
 from pydantic import BaseModel, ConfigDict
+
+from schemas.module import ModuleResponse
 
 
 class CourseBase(BaseModel):
