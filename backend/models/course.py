@@ -5,6 +5,7 @@ Course model for managing courses
 from datetime import datetime
 
 from sqlalchemy import TIMESTAMP, Column, Integer, String, Text
+from sqlalchemy.ext.associationproxy import association_proxy
 
 from .base import Base
 
@@ -21,3 +22,8 @@ class Course(Base):
     )
 
     # Note: Relationships to modules and groups will be added by students
+
+    # Many-to-Many Joins
+    users = association_proxy("course_users", "users")
+    modules = association_proxy("course_modules", "modules")
+    users_who_completed_course = association_proxy("completed_user_items", "users")
