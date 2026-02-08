@@ -14,7 +14,6 @@ class CourseUser(Base):
     id = Column(Integer, primary_key=True)
     course_id = Column(Integer, ForeignKey("courses.id"), nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    order = Column(Integer, default=0)
 
     created_at = Column(TIMESTAMP, default=datetime.utcnow)
     updated_at = Column(TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow)

@@ -13,6 +13,7 @@ from sqlalchemy import (
     Integer,
     String,
 )
+from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import relationship
 
 from .base import Base
@@ -51,3 +52,9 @@ class User(Base):
 
     # Relationship to Role
     role = relationship("Role", backref="users")
+
+    # Many-to-Many Joins
+    courses = association_proxy("course_users", "courses")
+    completed_courses = association_proxy("completed_user_items", "courses")
+    completed_modules = association_proxy("completed_user_items", "modules")
+    completed_posts = association_proxy("completed_user_items", "posts")

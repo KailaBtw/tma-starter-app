@@ -13,7 +13,7 @@ class PostContent(Base):
 
     id = Column(Integer, primary_key=True)
     post_id = Column(Integer, ForeignKey("posts.id"))
-    order = Column(Integer, default=0)
+    ordering = Column(Integer, default=0)
     content = Column(Text)
     content_type = Column(Text)
 

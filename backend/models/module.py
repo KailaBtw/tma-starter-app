@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import TIMESTAMP, Column, Integer, Text
+from sqlalchemy.ext.associationproxy import association_proxy
 
 from .base import Base
 
@@ -16,3 +17,8 @@ class Module(Base):
 
     created_at = Column(TIMESTAMP, default=datetime.utcnow)
     updated_at = Column(TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Many-to-Many Joins
+    courses = association_proxy("course_modules", "courses")
+    posts = association_proxy("module_posts", "posts")
+    users_who_completed_module = association_proxy("completed_user_items", "users")
