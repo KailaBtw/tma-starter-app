@@ -7,6 +7,8 @@ from typing import List, Optional
 
 from pydantic import BaseModel, ConfigDict
 
+from schemas.module import ModuleResponse
+
 
 class CourseBase(BaseModel):
     """Base schema with common course fields"""
@@ -38,20 +40,8 @@ class CourseResponse(CourseBase):
     id: int
     created_at: datetime
     updated_at: datetime
-    module_count: int = 0
+    # module_count: int = 0
     # file_url will be implemented by students when file upload is added
-
-
-class ModuleInCourse(BaseModel):
-    """Module information included in course"""
-
-    model_config = ConfigDict(from_attributes=True)
-
-    module_id: int
-    module_title: str
-    module_description: Optional[str]
-    module_color: Optional[str] = None  # Hex color code (e.g., #FF5733)
-    ordering: int
 
 
 class CourseDetailResponse(CourseResponse):
@@ -59,4 +49,4 @@ class CourseDetailResponse(CourseResponse):
 
     model_config = ConfigDict(from_attributes=True)
 
-    modules: List[ModuleInCourse] = []
+    modules: List[ModuleResponse] = []

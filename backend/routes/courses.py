@@ -7,10 +7,11 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, Security, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy.orm import joinedload
 
 from auth import get_current_active_user, require_admin, security_scheme
 from database import get_db
-from models import Course, CourseGroup, UserGroup
+from models import Course, CourseGroup, CourseModule, UserGroup
 from schemas.course import (
     CourseCreate,
     CourseDetailResponse,
@@ -91,22 +92,30 @@ async def get_course(
     """
     Get a single course by ID. Modules will be implemented by students.
     """
-    result = await db.execute(select(Course).where(Course.id == course_id))
-    course = result.scalar_one_or_none()
+    result = await db.execute(
+        select(Course)
+        # Ordering
+        .outerjoin(CourseModule, CourseModule.course_id == Course.id)
+        .where(Course.id == course_id)
+        .options(joinedload(Course.course_modules).joinedload(CourseModule.module))
+        .order_by(CourseModule.ordering)
+    )
+    course = result.unique().scalar_one_or_none()
 
     if course is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Course not found"
         )
 
-    return {
-        "id": course.id,
-        "title": course.title,
-        "description": course.description,
-        "created_at": course.created_at,
-        "updated_at": course.updated_at,
-        "modules": [],  # Modules will be implemented by students
-    }
+    return course
+    # {
+    #     "id": course.id,
+    #     "title": course.title,
+    #     "description": course.description,
+    #     "created_at": course.created_at,
+    #     "updated_at": course.updated_at,
+    #     "modules": [],  # Modules will be implemented by students
+    # }
 
 
 @router.post(
