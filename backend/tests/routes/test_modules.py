@@ -107,20 +107,20 @@ async def modules_with_enrollments(test_db, regular_user):
 
 @pytest.mark.asyncio
 async def test_get_modules_needs_auth(client: AsyncClient):
-     """
-     Test that GET /api/modules requires authentication
+    """
+    Test that GET /api/modules requires authentication
 
-     Contract:
-        - Input: Unauthenticated request
-        - Behavior: Should return 401 Unauthorized
-        - Output: 401 status code
-        - Errors: None
-     """
-     # Act: Make request without authentication headers
-     response = await client.get("/api/modules")
+    Contract:
+    - Input: Unauthenticated request
+    - Behavior: Should return 401 Unauthorized
+    - Output: 401 status code
+    - Errors: None
+    """
+    # Act: Make request without authentication headers
+    response = await client.get("/api/modules")
 
-     # Assert: Should return 401 Unauthorized
-     assert response.status_code == 401
+    # Assert: Should return 401 Unauthorized
+    assert response.status_code == 401
 
 
 @pytest.mark.asyncio
@@ -222,20 +222,20 @@ async def test_get_modules_not_empty(
 
 @pytest.mark.asyncio
 async def test_get_module_by_id_needs_auth(client: AsyncClient):
-     """
-     Test that GET /api/modules/{id} requires authentication
+    """
+    Test that GET /api/modules/{id} requires authentication
 
-     Contract:
-        - Input: Unauthenticated request
-        - Behavior: Should return 401 Unauthorized
-        - Output: 401 status code
-        - Errors: None
-     """
-     # Act: Make request without authentication headers
-     response = await client.get("/api/modules/1")
+    Contract:
+    - Input: Unauthenticated request
+    - Behavior: Should return 401 Unauthorized
+    - Output: 401 status code
+    - Errors: None
+    """
+    # Act: Make request without authentication headers
+    response = await client.get("/api/modules/1")
 
-     # Assert: Should return 401 Unauthorized
-     assert response.status_code == 401
+    # Assert: Should return 401 Unauthorized
+    assert response.status_code == 401
      
 @pytest.mark.asyncio
 async def test_get_module_admin_success(
