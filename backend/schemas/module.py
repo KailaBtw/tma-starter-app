@@ -26,6 +26,7 @@ class ModuleUpdate(BaseModel):
     # Title is required for create but optional for update.
 
     title: Optional[str] = None
+    description: Optional[str] = None
 
 
 class ModuleResponse(ModuleBase):

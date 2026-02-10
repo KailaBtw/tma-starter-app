@@ -8,7 +8,7 @@ from sqlalchemy.future import select
 
 from models import Group, User
 
-pytest_plugins = ["tests.test_groups_helper"]
+pytest_plugins = ["tests.routes.test_groups_helper"]
 
 
 # Route: /api/groups
