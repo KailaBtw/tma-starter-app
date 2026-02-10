@@ -105,6 +105,7 @@ async def modules_with_enrollments(test_db, regular_user):
 # GET - get_modules tests
 ###############################################################################
 
+
 @pytest.mark.asyncio
 async def test_get_modules_needs_auth(client: AsyncClient):
     """
@@ -186,7 +187,7 @@ async def test_get_modules_not_empty(
     """
     Test that GET /api/modules returns *non-empty* list when modules exist
 
-    Contract: 
+    Contract:
         - Input: Authenticated request when modules exist
         - Behavior: Should return list of modules
         - Output: 200 status code with non-empty list
@@ -236,8 +237,8 @@ async def test_get_module_by_id_needs_auth(client: AsyncClient):
 
     # Assert: Should return 401 Unauthorized
     assert response.status_code == 401
-    
-    
+
+
 @pytest.mark.asyncio
 async def test_get_module_admin_success(
     client: AsyncClient, auth_headers, admin_user, modules_with_enrollments, test_module
@@ -256,11 +257,11 @@ async def test_get_module_admin_success(
     assert response.status_code == 200
 
     data = response.json()
-    
+
     # Assert: Returned module should match requested ID
     assert data["id"] == test_module.id
-    
-    
+
+
 @pytest.mark.asyncio
 async def test_get_module_by_id_not_found(client: AsyncClient, auth_headers):
     """
@@ -378,10 +379,7 @@ async def test_create_module_success(
         - Output: 201 Created with module object
         - Errors: None
     """
-    module_data = {
-        "title": "Suauce",
-        "description": "Bruh Bruh Bruh"
-    }
+    module_data = {"title": "Suauce", "description": "Bruh Bruh Bruh"}
 
     # Act: Make authenticated request to create module
     response = await client.post("/api/modules", json=module_data, headers=auth_headers)
@@ -419,6 +417,7 @@ async def test_create_module_success(
 ###############################################################################
 # PATCH - update_module tests
 ###############################################################################
+
 
 @pytest.mark.asyncio
 async def test_update_module_requires_auth(client: AsyncClient):
@@ -514,6 +513,7 @@ async def test_update_module_success(
 ###############################################################################
 # DELETE - delete_module tests
 ###############################################################################
+
 
 @pytest.mark.asyncio
 async def test_delete_module_requires_auth(client: AsyncClient):
