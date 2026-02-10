@@ -299,7 +299,7 @@ async def test_get_module_by_id_success(client: AsyncClient, auth_headers, test_
     # Assert: Should return 200 OK
     assert response.status_code == 200
 
-    # Assert: Response should be a module object with expected fields
+    # Assert: Response should be a module object with expected fields # noqa
     data = response.json()
     assert data["id"] == test_module.id
     assert data["title"] == test_module.title
