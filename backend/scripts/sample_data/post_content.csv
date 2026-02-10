@@ -1,0 +1,5 @@
+post_title,ordering,content,content_type
+TestPostUno,1,[video_url],video
+TestPostUno,2,[pdf_download],attachment
+TestPostDos,1,[text],default
+TestPostDos,2,[quiz],quiz

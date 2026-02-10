@@ -20,6 +20,7 @@ from pathlib import Path
 # Add parent directory to path to import modules
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+import populate_helper
 from dotenv import load_dotenv  # noqa: E402
 from faker import Faker  # noqa: E402
 from sqlalchemy import text  # noqa: E402
@@ -460,6 +461,16 @@ async def main(reset: bool = False):
             user_groups_data = load_csv(SAMPLE_DATA_DIR / "user_groups.csv")
             course_groups_data = load_csv(SAMPLE_DATA_DIR / "course_groups.csv")
 
+            modules_data = load_csv(SAMPLE_DATA_DIR / "modules.csv")
+            posts_data = load_csv(SAMPLE_DATA_DIR / "posts.csv")
+            post_content_data = load_csv(SAMPLE_DATA_DIR / "post_content.csv")
+            course_users_data = load_csv(SAMPLE_DATA_DIR / "course_users.csv")
+            course_modules_data = load_csv(SAMPLE_DATA_DIR / "course_modules.csv")
+            module_posts_data = load_csv(SAMPLE_DATA_DIR / "module_posts.csv")
+            completed_user_items_data = load_csv(
+                SAMPLE_DATA_DIR / "completed_user_items.csv"
+            )
+
             # Count how many regular users are already in CSV
             regular_users_in_csv = sum(
                 1 for u in users_data if u.get("role", "user").lower() != "admin"
@@ -481,6 +492,10 @@ async def main(reset: bool = False):
             users_lookup = {}
             groups_lookup = {}
             courses_lookup = {}
+
+            modules_lookup = {}
+            posts_lookup = {}
+            post_content_lookup = []
 
             # Create users
             print("\n👤 Creating users...")
@@ -545,6 +560,38 @@ async def main(reset: bool = False):
                 print(f"   ✅ Created course: {course.title}")
 
             await db.commit()
+
+            # Create modules
+            for module_data in modules_data:
+                module = await populate_helper.create_module_from_csv(db, module_data)
+                modules_lookup[module.title] = module
+
+            await db.commit()
+
+            for module in modules_lookup.values():
+                await db.refresh(module)
+
+            # Create posts
+            for post_data in posts_data:
+                post = await populate_helper.create_post_from_csv(db, post_data)
+                posts_lookup[post.title] = post
+
+            await db.commit()
+
+            for post in posts_lookup.values():
+                await db.refresh(post)
+
+            # Create post content
+            for post_content_d in post_content_data:
+                post_content = await populate_helper.create_post_content_from_csv(
+                    db, post_content_d
+                )
+                post_content_lookup.append(post_content)
+
+            await db.commit()
+
+            for post_content in post_content_lookup:
+                await db.refresh(post_content)
 
             # Add users to groups (from CSV and auto-generated)
             print("\n🔗 Adding users to groups...")
@@ -624,6 +671,44 @@ async def main(reset: bool = False):
                 print(
                     f"   ✅ Assigned '{course.title}' to '{group.name}' "
                     f"(ordering={ordering})"
+                )
+
+            await db.commit()
+
+            # Add users to courses
+            for rel_data in course_users_data:
+                course = courses_lookup[rel_data["course_title"]]
+                user = users_lookup[rel_data["username"]]
+                await populate_helper.add_user_to_course(db, course, user)
+
+            await db.commit()
+
+            # Add modules to courses
+            for rel_data in course_modules_data:
+                course = courses_lookup[rel_data["course_title"]]
+                module = modules_lookup[rel_data["module_title"]]
+                ordering = int(rel_data["ordering"])
+                await populate_helper.add_module_to_course(db, course, module, ordering)
+
+            await db.commit()
+
+            # Add posts to modules
+            for rel_data in module_posts_data:
+                module = modules_lookup[rel_data["module_title"]]
+                post = posts_lookup[rel_data["post_title"]]
+                ordering = int(rel_data["ordering"])
+                await populate_helper.add_post_to_module(db, module, post, ordering)
+
+            await db.commit()
+
+            # Mark courses / modules / posts as completed for users
+            for rel_data in completed_user_items_data:
+                user = users_lookup[rel_data["username"]]
+                course = courses_lookup.get(rel_data["course_title"])
+                module = modules_lookup.get(rel_data["module_title"])
+                post = posts_lookup.get(rel_data["post_title"])
+                await populate_helper.mark_item_as_completed_for_user(
+                    db, user, course, module, post
                 )
 
             await db.commit()
