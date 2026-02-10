@@ -20,6 +20,7 @@ import UserCoursesPage from './pages/users/UserCoursesPage.tsx';
 import UserProgressPage from './pages/users/UserProgressPage.tsx';
 
 // Group pages
+import PracticeGroupsPage from './pages/groups/PracticeGroupsPage.tsx';
 import GroupsPage from './pages/groups/GroupsPage.tsx';
 import GroupDetailPage from './pages/groups/GroupDetailPage.tsx';
 
@@ -116,6 +117,16 @@ export default function App() {
                                 <ProtectedRoute requiredRole="admin">
                                     <Layout>
                                         <GroupDetailPage />
+                                    </Layout>
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/dashboard/user/practice_groups"
+                            element={
+                                <ProtectedRoute>
+                                    <Layout>
+                                        <PracticeGroupsPage />
                                     </Layout>
                                 </ProtectedRoute>
                             }
