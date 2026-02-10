@@ -237,6 +237,7 @@ async def test_get_module_by_id_needs_auth(client: AsyncClient):
     # Assert: Should return 401 Unauthorized
     assert response.status_code == 401
     
+    
 @pytest.mark.asyncio
 async def test_get_module_admin_success(
     client: AsyncClient, auth_headers, admin_user, modules_with_enrollments, test_module
