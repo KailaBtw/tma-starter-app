@@ -51,7 +51,7 @@ async def modules_with_enrollments(test_db, regular_user):
 
     Setup:
     - Two courses: course_a and course_b
-    - Three modules: module_a1, module_a2 (linked to course_a), module_b1 (linked to course_b)
+    - Three modules: module_a1, module_a2 (linked to course_a), module_b1 (linked to course_b) # noqa E501
     - regular_user is enrolled only in course_a
 
     This allows testing:
@@ -90,7 +90,7 @@ async def modules_with_enrollments(test_db, regular_user):
         session.add(CourseUser(course_id=course_a.id, user_id=regular_user.id))
         await session.commit()
 
-        # Return the first module for backwards compatibility with tests that use test_module
+        # Return the first module for backwards compatibility with tests that use test_module  # noqa E501
         # But also return a dict with all entities for tests that need them
         return {
             "course_a": course_a,
@@ -312,7 +312,7 @@ async def test_get_module_by_id_success(client: AsyncClient, auth_headers, test_
 #     }
 
 #     # Act: Make authenticated request with input
-#     response = await client.post("/api/courses", json=course_data, headers=auth_headers)
+#     response = await client.post("/api/courses", json=course_data, headers=auth_headers)  # noqa E501
 
 #     # Assert: Should return 422 Unprocessable Entity
 #     assert response.status_code == 422

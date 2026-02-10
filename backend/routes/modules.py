@@ -11,13 +11,9 @@ from sqlalchemy.future import select
 from auth import get_current_active_user, require_admin, security_scheme
 from database import get_db
 from models import (
-    Course,
-    CourseGroup,
     CourseModule,
     CourseUser,
     Module,
-    ModulePost,
-    UserGroup,
 )
 from schemas.module import (
     ModuleCreate,
