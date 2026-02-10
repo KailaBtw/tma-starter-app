@@ -236,7 +236,7 @@ async def test_get_module_by_id_needs_auth(client: AsyncClient):
 
     # Assert: Should return 401 Unauthorized
     assert response.status_code == 401
-     
+    
 @pytest.mark.asyncio
 async def test_get_module_admin_success(
     client: AsyncClient, auth_headers, admin_user, modules_with_enrollments, test_module
@@ -274,10 +274,10 @@ async def test_get_module_by_id_not_found(client: AsyncClient, auth_headers):
     # Act: Request a module ID that doesn't exist
     response = await client.get("/api/modules/99999", headers=auth_headers)
 
-     # Assert: Should return 404 Not Found
+    # Assert: Should return 404 Not Found
     assert response.status_code == 404
 
-     # Assert: Error message should indicate module not found
+    # Assert: Error message should indicate module not found
     data = response.json()
     assert "not found" in data["detail"].lower()
 
@@ -335,7 +335,7 @@ async def test_create_module_needs_auth(client: AsyncClient):
 
     # Act: Make request without authentication headers
     response = await client.post("/api/modules", json=module_data)
-     # Assert: Should return 401 Unauthorized even with valid data
+    # Assert: Should return 401 Unauthorized even with valid data
     assert response.status_code == 401
 
 
