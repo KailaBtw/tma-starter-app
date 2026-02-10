@@ -10,7 +10,15 @@ from sqlalchemy.future import select
 
 from auth import get_current_active_user, require_admin, security_scheme
 from database import get_db
-from models import Course, CourseGroup, CourseModule, Module, ModulePost, UserGroup, CourseUser
+from models import (
+    Course,
+    CourseGroup,
+    CourseModule,
+    CourseUser,
+    Module,
+    ModulePost,
+    UserGroup,
+)
 from schemas.module import (
     ModuleCreate,
     ModuleDetailResponse,
@@ -21,6 +29,7 @@ from schemas.module import (
 # File upload functionality removed - students will implement
 
 router = APIRouter(prefix="/modules", tags=["modules"])
+
 
 # /api/modules 	GET 	List modules accessible to the user
 @router.get(
@@ -77,6 +86,7 @@ async def get_modules(
 
     return module_list
 
+
 # /api/modules/{id} 	GET 	Get a single module
 @router.get(
     "/{module_id}",
@@ -91,9 +101,7 @@ async def get_module(
     """
     Get a single module by ID.
     """
-    result = await db.execute(
-        select(Module).where(Module.id == module_id)
-    )
+    result = await db.execute(select(Module).where(Module.id == module_id))
     module = result.scalar_one_or_none()
 
     if module is None:
@@ -102,6 +110,7 @@ async def get_module(
         )
 
     return module
+
 
 # /api/modules 	POST 	Create a new module
 @router.post(
@@ -190,6 +199,7 @@ async def update_module(
         "updated_at": module.updated_at,
         "post_count": 0,  # Posts will be implemented by students
     }
+
 
 # /api/modules/{id} 	DELETE 	Delete a module
 @router.delete(
