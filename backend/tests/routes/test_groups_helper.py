@@ -11,6 +11,7 @@ from models import Group, Role, User, UserGroup
 from server import app
 
 
+# Creates groups for users, managers, and admins
 @pytest.fixture(scope="function")
 async def seeded_db(test_db):
     TestSessionLocal = sessionmaker(
@@ -49,6 +50,7 @@ async def seeded_db(test_db):
         yield session
 
 
+# Creates admin user and adds them to the admin group
 @pytest.fixture
 async def admin_user_g(seeded_db):
     """Create an admin user for testing (roles already exist from test_db fixture)"""
@@ -92,6 +94,7 @@ async def admin_user_g(seeded_db):
     return admin_with_role
 
 
+# Creates admin headers
 @pytest.fixture
 async def admin_headers(client, admin_user_g, seeded_db):
     """Get authentication headers by overriding auth dependencies"""
@@ -114,6 +117,17 @@ async def admin_headers(client, admin_user_g, seeded_db):
     app.dependency_overrides.pop(require_admin, None)
 
 
+# Gets admin group
+@pytest.fixture
+async def admin_group(seeded_db):
+    session = seeded_db
+    result = await session.execute(select(Group).where(Group.name == "group_admins"))
+    group = result.scalar_one()
+
+    return group
+
+
+# Creates manager user and adds them to the manager group
 @pytest.fixture
 async def manager_user(seeded_db):
     """Create a manager user for testing (roles already exist from test_db fixture)"""
@@ -157,6 +171,7 @@ async def manager_user(seeded_db):
     return manager_with_role
 
 
+# Gets manager headers
 @pytest.fixture
 async def manager_headers(client, manager_user, seeded_db):
     """Get authentication headers by overriding auth dependencies"""
@@ -179,6 +194,17 @@ async def manager_headers(client, manager_user, seeded_db):
     app.dependency_overrides.pop(require_admin, None)
 
 
+# Gets manager group
+@pytest.fixture
+async def manager_group(seeded_db):
+    session = seeded_db
+    result = await session.execute(select(Group).where(Group.name == "group_managers"))
+    group = result.scalar_one()
+
+    return group
+
+
+# Creates normal user and adds them to the user group
 @pytest.fixture
 async def normal_user(seeded_db):
     """Create a normal user for testing (roles already exist from test_db fixture)"""
@@ -222,6 +248,7 @@ async def normal_user(seeded_db):
     return user_with_role
 
 
+# Gets user headers
 @pytest.fixture
 async def user_headers(client, normal_user, seeded_db):
     """Get authentication headers by overriding auth dependencies"""
@@ -237,3 +264,13 @@ async def user_headers(client, normal_user, seeded_db):
 
     # Clean up overrides after test
     app.dependency_overrides.pop(get_current_user, None)
+
+
+# Gets user group
+@pytest.fixture
+async def user_group(seeded_db):
+    session = seeded_db
+    result = await session.execute(select(Group).where(Group.name == "group_users"))
+    group = result.scalar_one()
+
+    return group

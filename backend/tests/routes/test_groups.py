@@ -4,9 +4,6 @@ Contract-level tests for the /api/groups endpoint
 
 import pytest
 from httpx import AsyncClient
-from sqlalchemy.future import select
-
-from models import Group, User
 
 pytest_plugins = ["tests.routes.test_groups_helper"]
 
@@ -70,11 +67,10 @@ async def test_get_all_groups_requires_auth(client: AsyncClient, seeded_db):
 # Request: GET
 # Response: GroupDetailResponse
 @pytest.mark.asyncio
-async def test_get_group_by_id_admin(client: AsyncClient, admin_headers, seeded_db):
-    session = seeded_db
-
-    result = await session.execute(select(Group).where(Group.name == "group_admins"))
-    group = result.scalar_one()
+async def test_get_group_by_id_admin(
+    client: AsyncClient, admin_headers, admin_group, seeded_db
+):
+    group = admin_group
     group_id = group.id
 
     response = await client.get(f"/api/groups/{group_id}", headers=admin_headers)
@@ -96,12 +92,9 @@ async def test_get_group_by_id_admin(client: AsyncClient, admin_headers, seeded_
 
 @pytest.mark.asyncio
 async def test_get_group_by_id_admin_access(
-    client: AsyncClient, admin_headers, seeded_db, normal_user
+    client: AsyncClient, admin_headers, normal_user, user_group, seeded_db
 ):
-    session = seeded_db
-
-    result = await session.execute(select(Group).where(Group.name == "group_users"))
-    group = result.scalar_one()
+    group = user_group
     group_id = group.id
 
     response = await client.get(f"/api/groups/{group_id}", headers=admin_headers)
@@ -113,11 +106,10 @@ async def test_get_group_by_id_admin_access(
 
 
 @pytest.mark.asyncio
-async def test_get_group_by_id_manager(client: AsyncClient, manager_headers, seeded_db):
-    session = seeded_db
-
-    result = await session.execute(select(Group).where(Group.name == "group_managers"))
-    group = result.scalar_one()
+async def test_get_group_by_id_manager(
+    client: AsyncClient, manager_headers, manager_group, seeded_db
+):
+    group = manager_group
     group_id = group.id
 
     response = await client.get(f"/api/groups/{group_id}", headers=manager_headers)
@@ -130,12 +122,9 @@ async def test_get_group_by_id_manager(client: AsyncClient, manager_headers, see
 
 @pytest.mark.asyncio
 async def test_get_group_by_id_manager_access(
-    client: AsyncClient, manager_headers, seeded_db, normal_user
+    client: AsyncClient, manager_headers, normal_user, user_group, seeded_db
 ):
-    session = seeded_db
-
-    result = await session.execute(select(Group).where(Group.name == "group_users"))
-    group = result.scalar_one()
+    group = user_group
     group_id = group.id
 
     response = await client.get(f"/api/groups/{group_id}", headers=manager_headers)
@@ -147,11 +136,10 @@ async def test_get_group_by_id_manager_access(
 
 
 @pytest.mark.asyncio
-async def test_get_group_by_id_user(client: AsyncClient, user_headers, seeded_db):
-    session = seeded_db
-
-    result = await session.execute(select(Group).where(Group.name == "group_users"))
-    group = result.scalar_one()
+async def test_get_group_by_id_user(
+    client: AsyncClient, user_headers, user_group, seeded_db
+):
+    group = user_group
     group_id = group.id
 
     response = await client.get(f"/api/groups/{group_id}", headers=user_headers)
@@ -163,11 +151,10 @@ async def test_get_group_by_id_user(client: AsyncClient, user_headers, seeded_db
 
 
 @pytest.mark.asyncio
-async def test_get_group_by_id_requires_auth(client: AsyncClient, seeded_db):
-    session = seeded_db
-
-    result = await session.execute(select(Group).where(Group.name == "group_users"))
-    group = result.scalar_one()
+async def test_get_group_by_id_requires_auth(
+    client: AsyncClient, user_group, seeded_db
+):
+    group = user_group
     group_id = group.id
 
     response = await client.get(f"/api/groups/{group_id}")
@@ -176,12 +163,9 @@ async def test_get_group_by_id_requires_auth(client: AsyncClient, seeded_db):
 
 @pytest.mark.asyncio
 async def test_get_group_id_insufficient_permission(
-    client: AsyncClient, user_headers, seeded_db
+    client: AsyncClient, user_headers, admin_group, seeded_db
 ):
-    session = seeded_db
-
-    result = await session.execute(select(Group).where(Group.name == "group_admins"))
-    group = result.scalar_one()
+    group = admin_group
     group_id = group.id
 
     response = await client.get(f"/api/groups/{group_id}", headers=user_headers)
@@ -199,11 +183,10 @@ async def test_get_group_id_not_found(client: AsyncClient, admin_headers, seeded
 # Request: POST
 # Response: GroupResponse
 @pytest.mark.asyncio
-async def test_create_group_admin(client: AsyncClient, admin_headers, seeded_db):
-    session = seeded_db
-
-    result = await session.execute(select(User).where(User.username == "admin"))
-    creator = result.scalar_one()
+async def test_create_group_admin(
+    client: AsyncClient, admin_user_g, admin_headers, seeded_db
+):
+    creator = admin_user_g
     creator_id = creator.id
 
     group_data = {
@@ -236,11 +219,10 @@ async def test_create_group_admin(client: AsyncClient, admin_headers, seeded_db)
 
 
 @pytest.mark.asyncio
-async def test_create_group_manager(client: AsyncClient, manager_headers, seeded_db):
-    session = seeded_db
-
-    result = await session.execute(select(User).where(User.username == "manager"))
-    creator = result.scalar_one()
+async def test_create_group_manager(
+    client: AsyncClient, manager_user, manager_headers, seeded_db
+):
+    creator = manager_user
     creator_id = creator.id
 
     group_data = {
@@ -264,11 +246,10 @@ async def test_create_group_manager(client: AsyncClient, manager_headers, seeded
 
 
 @pytest.mark.asyncio
-async def test_create_group_empty_name(client: AsyncClient, admin_headers, seeded_db):
-    session = seeded_db
-
-    result = await session.execute(select(User).where(User.username == "admin"))
-    creator = result.scalar_one()
+async def test_create_group_empty_name(
+    client: AsyncClient, admin_user_g, admin_headers, seeded_db
+):
+    creator = admin_user_g
     creator_id = creator.id
 
     group_data = {
@@ -289,12 +270,9 @@ async def test_create_group_requires_auth(client: AsyncClient, seeded_db):
 
 @pytest.mark.asyncio
 async def test_create_group_insufficient_permission(
-    client: AsyncClient, user_headers, seeded_db
+    client: AsyncClient, normal_user, user_headers, seeded_db
 ):
-    session = seeded_db
-
-    result = await session.execute(select(User).where(User.username == "user"))
-    creator = result.scalar_one()
+    creator = normal_user
     creator_id = creator.id
 
     group_data = {
@@ -319,11 +297,10 @@ async def test_create_group_invalid_input(
 # Request: PATCH
 # Response: GroupResponse
 @pytest.mark.asyncio
-async def test_update_group_admin(client: AsyncClient, admin_headers, seeded_db):
-    session = seeded_db
-
-    result = await session.execute(select(Group).where(Group.name == "group_admins"))
-    group = result.scalar_one()
+async def test_update_group_admin(
+    client: AsyncClient, admin_headers, admin_group, seeded_db
+):
+    group = admin_group
     group_id = group.id
 
     group_data = {
@@ -356,11 +333,10 @@ async def test_update_group_admin(client: AsyncClient, admin_headers, seeded_db)
 
 
 @pytest.mark.asyncio
-async def test_update_group_manager(client: AsyncClient, manager_headers, seeded_db):
-    session = seeded_db
-
-    result = await session.execute(select(Group).where(Group.name == "group_managers"))
-    group = result.scalar_one()
+async def test_update_group_manager(
+    client: AsyncClient, manager_headers, manager_group, seeded_db
+):
+    group = manager_group
     group_id = group.id
 
     group_data = {
@@ -382,12 +358,9 @@ async def test_update_group_manager(client: AsyncClient, manager_headers, seeded
 
 @pytest.mark.asyncio
 async def test_update_group_whitespace_error(
-    client: AsyncClient, admin_headers, seeded_db
+    client: AsyncClient, admin_headers, admin_group, seeded_db
 ):
-    session = seeded_db
-
-    result = await session.execute(select(Group).where(Group.name == "group_admins"))
-    group = result.scalar_one()
+    group = admin_group
     group_id = group.id
 
     group_data = {
@@ -401,11 +374,8 @@ async def test_update_group_whitespace_error(
 
 
 @pytest.mark.asyncio
-async def test_update_group_requires_auth(client: AsyncClient, seeded_db):
-    session = seeded_db
-
-    result = await session.execute(select(Group).where(Group.name == "group_users"))
-    group = result.scalar_one()
+async def test_update_group_requires_auth(client: AsyncClient, user_group, seeded_db):
+    group = user_group
     group_id = group.id
 
     group_data = {
@@ -418,12 +388,9 @@ async def test_update_group_requires_auth(client: AsyncClient, seeded_db):
 
 @pytest.mark.asyncio
 async def test_update_group_insufficient_permission(
-    client: AsyncClient, user_headers, seeded_db
+    client: AsyncClient, user_headers, user_group, seeded_db
 ):
-    session = seeded_db
-
-    result = await session.execute(select(Group).where(Group.name == "group_users"))
-    group = result.scalar_one()
+    group = user_group
     group_id = group.id
 
     group_data = {
@@ -453,11 +420,10 @@ async def test_update_group_id_not_found(client: AsyncClient, admin_headers, see
 # Request: DELETE
 # Response: None
 @pytest.mark.asyncio
-async def test_delete_group_admin(client: AsyncClient, admin_headers, seeded_db):
-    session = seeded_db
-
-    result = await session.execute(select(Group).where(Group.name == "group_admins"))
-    group = result.scalar_one()
+async def test_delete_group_admin(
+    client: AsyncClient, admin_headers, admin_group, seeded_db
+):
+    group = admin_group
     group_id = group.id
 
     response = await client.delete(f"/api/groups/{group_id}", headers=admin_headers)
@@ -472,11 +438,10 @@ async def test_delete_group_admin(client: AsyncClient, admin_headers, seeded_db)
 
 
 @pytest.mark.asyncio
-async def test_delete_group_manager(client: AsyncClient, manager_headers, seeded_db):
-    session = seeded_db
-
-    result = await session.execute(select(Group).where(Group.name == "group_managers"))
-    group = result.scalar_one()
+async def test_delete_group_manager(
+    client: AsyncClient, manager_headers, manager_group, seeded_db
+):
+    group = manager_group
     group_id = group.id
 
     response = await client.delete(f"/api/groups/{group_id}", headers=manager_headers)
@@ -487,11 +452,8 @@ async def test_delete_group_manager(client: AsyncClient, manager_headers, seeded
 
 
 @pytest.mark.asyncio
-async def test_delete_group_requires_auth(client: AsyncClient, seeded_db):
-    session = seeded_db
-
-    result = await session.execute(select(Group).where(Group.name == "group_users"))
-    group = result.scalar_one()
+async def test_delete_group_requires_auth(client: AsyncClient, user_group, seeded_db):
+    group = user_group
     group_id = group.id
 
     response = await client.delete(f"/api/groups/{group_id}")
@@ -500,12 +462,9 @@ async def test_delete_group_requires_auth(client: AsyncClient, seeded_db):
 
 @pytest.mark.asyncio
 async def test_delete_group_insufficient_permission(
-    client: AsyncClient, user_headers, seeded_db
+    client: AsyncClient, user_headers, user_group, seeded_db
 ):
-    session = seeded_db
-
-    result = await session.execute(select(Group).where(Group.name == "group_users"))
-    group = result.scalar_one()
+    group = user_group
     group_id = group.id
 
     response = await client.delete(f"/api/groups/{group_id}", headers=user_headers)
