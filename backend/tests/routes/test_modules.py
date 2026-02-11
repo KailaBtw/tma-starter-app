@@ -102,23 +102,26 @@ async def modules_with_enrollments(test_db, regular_user):
 
 
 ###############################################################################
-# GET - get_all_courses tests (will be adapted to modules)
+# GET - get_modules tests
 ###############################################################################
-# UPDATE THESE TESTS BELOW FOR MODULES ENDPOINTS!!!
 
-# @pytest.mark.asyncio
-# async def test_get_all_courses_needs_auth(client: AsyncClient):
-#     """
-#     Test that GET /api/courses requires authentication
 
-#     Contract: Unauthenticated requests should return 401 Unauthorized
-#     This is a security requirement - courses endpoint should be protected.
-#     """
-#     # Act: Make request without authentication headers
-#     response = await client.get("/api/courses")
+@pytest.mark.asyncio
+async def test_get_modules_needs_auth(client: AsyncClient):
+    """
+    Test that GET /api/modules requires authentication
 
-#     # Assert: Should return 401 Unauthorized
-#     assert response.status_code == 401
+    Contract:
+    - Input: Unauthenticated request
+    - Behavior: Should return 401 Unauthorized
+    - Output: 401 status code
+    - Errors: None
+    """
+    # Act: Make request without authentication headers
+    response = await client.get("/api/modules")
+
+    # Assert: Should return 401 Unauthorized
+    assert response.status_code == 401
 
 
 @pytest.mark.asyncio
@@ -130,6 +133,12 @@ async def test_get_modules_user_only_theirs_success(
 ):
     """
     Regular user should see only modules from courses they are enrolled in.
+
+    Contract:
+        - Input: Authenticated request from regular user
+        - Behavior: Should return only modules from courses the user is enrolled in
+        - Output: 200 status code with list of modules
+        - Errors: None
     """
     response = await client.get("/api/modules", headers=regular_user_auth_headers)
     assert response.status_code == 200
@@ -146,11 +155,17 @@ async def test_get_modules_user_only_theirs_success(
 
 
 @pytest.mark.asyncio
-async def test_get_all_modules_admin_success(
+async def test_get_modules_admin_success(
     client: AsyncClient, auth_headers, admin_user, modules_with_enrollments
 ):
     """
     Admin should see all modules in the system.
+
+    Contract:
+        - Input: Authenticated request from admin user
+        - Behavior: Should return all modules in the system
+        - Output: 200 status code with list of all modules
+        - Errors: None
     """
     response = await client.get("/api/modules", headers=auth_headers)
     assert response.status_code == 200
@@ -172,8 +187,11 @@ async def test_get_modules_not_empty(
     """
     Test that GET /api/modules returns *non-empty* list when modules exist
 
-    Contract: When modules exist in the system:
-    - Status: 200 OK
+    Contract:
+        - Input: Authenticated request when modules exist
+        - Behavior: Should return list of modules
+        - Output: 200 status code with non-empty list
+        - Errors: Empty list or empty module when proper modules exist
     """
     # Act: Make authenticated request
     response = await client.get("/api/modules", headers=auth_headers)
@@ -199,43 +217,71 @@ async def test_get_modules_not_empty(
 
 
 ###############################################################################
-# GET - get_course tests
+# GET - get_module/{id} tests
 ###############################################################################
 
 
-# @pytest.mark.asyncio
-# async def test_get_course_by_id_needs_auth(client: AsyncClient):
-#     """
-#     Test that GET /api/courses/{id} requires authentication
+@pytest.mark.asyncio
+async def test_get_module_by_id_needs_auth(client: AsyncClient):
+    """
+    Test that GET /api/modules/{id} requires authentication
 
-#     Contract: Unauthenticated requests should return 401 Unauthorized
-#     Even with a valid course ID, needs auth.
-#     """
-#     # Act: Make request without authentication headers
-#     response = await client.get("/api/courses/1")
+    Contract:
+    - Input: Unauthenticated request
+    - Behavior: Should return 401 Unauthorized
+    - Output: 401 status code
+    - Errors: None
+    """
+    # Act: Make request without authentication headers
+    response = await client.get("/api/modules/1")
 
-#     # Assert: Should return 401 Unauthorized
-#     assert response.status_code == 401
+    # Assert: Should return 401 Unauthorized
+    assert response.status_code == 401
 
 
-# @pytest.mark.asyncio
-# async def test_get_course_by_id_not_found(client: AsyncClient, auth_headers):
-#     """
-#     Test that GET /api/courses/{id} returns 404 for non-existent course
+@pytest.mark.asyncio
+async def test_get_module_admin_success(
+    client: AsyncClient, auth_headers, admin_user, modules_with_enrollments, test_module
+):
+    """
+    Admin should see any module by ID.
 
-#     Contract: When requesting a course that doesn't exist:
-#     - Status: 404 Not Found
-#     - Response: Error message indicating course not found
-#     """
-#     # Act: Request a course ID that doesn't exist
-#     response = await client.get("/api/courses/99999", headers=auth_headers)
+    Contract:
+        - Input: Authenticated request from admin user
+        - Behavior: Should return the module with the specified ID
+        - Output: 200 status code with the module details
+        - Errors: None
+    """
+    # Act: Request a module ID that exists
+    response = await client.get(f"/api/modules/{test_module.id}", headers=auth_headers)
+    assert response.status_code == 200
 
-#     # Assert: Should return 404 Not Found
-#     assert response.status_code == 404
+    data = response.json()
 
-#     # Assert: Error message should indicate course not found
-#     data = response.json()
-#     assert "not found" in data["detail"].lower()
+    # Assert: Returned module should match requested ID
+    assert data["id"] == test_module.id
+
+
+@pytest.mark.asyncio
+async def test_get_module_by_id_not_found(client: AsyncClient, auth_headers):
+    """
+    Test that GET /api/modules/{id} returns 404 for non-existent module
+
+    Contract:
+        - Input: Authenticated request for non-existent module ID
+        - Behavior: Should return 404 Not Found
+        - Output: 404 status code with error message
+        - Errors: Module not found
+    """
+    # Act: Request a module ID that doesn't exist
+    response = await client.get("/api/modules/99999", headers=auth_headers)
+
+    # Assert: Should return 404 Not Found
+    assert response.status_code == 404
+
+    # Assert: Error message should indicate module not found
+    data = response.json()
+    assert "not found" in data["detail"].lower()
 
 
 @pytest.mark.asyncio
@@ -243,9 +289,11 @@ async def test_get_module_by_id_success(client: AsyncClient, auth_headers, test_
     """
     Test that GET /api/modules/{id} returns module details when authenticated
 
-    Contract: When requesting an existing module:
-    - Status: 200 OK
-    - Response: module object with expected fields
+    Contract:
+        - Input: Authenticated request for existing module ID
+        - Behavior: Should return the module details
+        - Output: 200 status code with module object
+        - Errors: None
     """
     # Act: Request a module ID that exists
     response = await client.get(f"/api/modules/{test_module.id}", headers=auth_headers)
@@ -253,7 +301,7 @@ async def test_get_module_by_id_success(client: AsyncClient, auth_headers, test_
     # Assert: Should return 200 OK
     assert response.status_code == 200
 
-    # Assert: Response should be a module object with expected fields
+    # Assert: Response should be a module object with expected fields # noqa
     data = response.json()
     assert data["id"] == test_module.id
     assert data["title"] == test_module.title
@@ -266,56 +314,84 @@ async def test_get_module_by_id_success(client: AsyncClient, auth_headers, test_
 
 
 ###############################################################################
-# POST - create_course tests
+# POST - create_module tests
 ###############################################################################
 
 
-# @pytest.mark.asyncio
-# async def test_create_course_needs_auth(client: AsyncClient):
-#     """
-#     Test that POST /api/courses requires authentication
+@pytest.mark.asyncio
+async def test_create_module_needs_auth(client: AsyncClient):
+    """
+    Test that POST /api/modules requires authentication
 
-#     Contract: Unauthenticated requests should return 401 Unauthorized
-#     Creating courses requires admin privileges.
-#     """
-#     # Arrange: Prepare course data valid format
-#     course_data = {
-#         "title": "Suauce",
-#         "description": "Bruh Bruh Bruh",
-#         # I think (hope) created_at and updated_at are auto seeded by backend???
-#         # Todo: add more fields as needed
-#     }
+    Contract:
+        - Input: Unauthenticated request
+        - Behavior: Should return 401 Unauthorized
+        - Output: 401 status code
+        - Errors: None
+    """
+    # Arrange: Prepare module data valid format
+    module_data = {
+        "title": "Suauce",
+        "description": "Bruh Bruh Bruh",
+    }
 
-#     # Act: Make request without authentication headers
-#     response = await client.post("/api/courses", json=course_data)
+    # Act: Make request without authentication headers
+    response = await client.post("/api/modules", json=module_data)
+    # Assert: Should return 401 Unauthorized even with valid data
+    assert response.status_code == 401
 
-#     # Assert: Should return 401 Unauthorized even with valid data
-#     assert response.status_code == 401
+
+@pytest.mark.asyncio
+async def test_create_module_needs_admin(
+    client: AsyncClient, regular_user_auth_headers
+):
+    """
+    Test that POST /api/modules requires admin privileges
+
+    Contract:
+        - Input: Authenticated request from non-admin user
+        - Behavior: Should return 403 Forbidden
+        - Output: 403 status code
+        - Errors: None
+    """
+    # Arrange: Prepare module data with valid format
+    module_data = {
+        "title": "Suauce",
+        "description": "Bruh Bruh Bruh",
+    }
+
+    # Act: Make authenticated request from regular user
+    response = await client.post(
+        "/api/modules", json=module_data, headers=regular_user_auth_headers
+    )
+
+    # Assert: Should return 403 Forbidden for regular user
+    assert response.status_code == 403
 
 
-# @pytest.mark.asyncio
-# async def test_create_course_invalid_input(
-#     client: AsyncClient, auth_headers, admin_user
-# ):
-#     """
-#     Test that POST /api/courses returns 422 for missing required fields
+@pytest.mark.asyncio
+async def test_create_module_invalid_input(
+    client: AsyncClient, auth_headers, admin_user
+):
+    """
+    Test that POST /api/modules returns 422 for missing required fields
 
-#     Contract: When creating a course with missing required fields:
-#     - Status: 422 Unprocessable Entity
-#     - This tests input validation - the API should reject invalid input
+    Contract:
+        - Input: Authenticated request with invalid module data (missing title)
+        - Behavior: Should return 422 Unprocessable Entity
+        - Output: 422 status code with error details
+        - Errors: Missing required fields
+    """
+    module_data = {
+        # "title" is missing
+        "description": "Bruh Bruh Bruh",
+    }
 
-#     Note: Even with authentication, invalid data should be rejected
-#     """
-#     course_data = {
-#         # "title" is missing
-#         "description": "Bruh Bruh Bruh",
-#     }
+    # Act: Make authenticated request with input
+    response = await client.post("/api/modules", json=module_data, headers=auth_headers)
 
-#     # Act: Make authenticated request with input
-#     response = await client.post("/api/courses", json=course_data, headers=auth_headers)  # noqa E501
-
-#     # Assert: Should return 422 Unprocessable Entity
-#     assert response.status_code == 422
+    # Assert: Should return 422 Unprocessable Entity
+    assert response.status_code == 422
 
 
 @pytest.mark.asyncio
@@ -325,19 +401,13 @@ async def test_create_module_success(
     """
     Test that POST /api/modules creates a module successfully
 
-    Contract: When creating a module with valid data:
-    - Status: 201 Created
-    - Response: module object with id and provided fields
-    - module should be retrievable via GET /api/modules/{id}
-
-    Note: test_db fixture ensures fresh database for each test
+    Contract:
+        - Input: Authenticated request with valid module data
+        - Behavior: Should create the module and return its details
+        - Output: 201 Created with module object
+        - Errors: None
     """
-    module_data = {
-        "title": "Suauce",
-        "description": "Bruh Bruh Bruh",
-        # I think (hope) created_at and updated_at are auto seeded by backend???
-        # Todo: add more fields as needed
-    }
+    module_data = {"title": "Suauce", "description": "Bruh Bruh Bruh"}
 
     # Act: Make authenticated request to create module
     response = await client.post("/api/modules", json=module_data, headers=auth_headers)
@@ -373,41 +443,70 @@ async def test_create_module_success(
 
 
 ###############################################################################
-# PATCH - update_course tests
+# PATCH - update_module tests
 ###############################################################################
 
 
-# @pytest.mark.asyncio
-# async def test_update_course_requires_auth(client: AsyncClient):
-#     """
-#     Test that PATCH /api/courses/{id} requires authentication
+@pytest.mark.asyncio
+async def test_update_module_requires_auth(client: AsyncClient):
+    """
+    Test that PATCH /api/modules/{id} requires authentication
 
-#     Contract: Unauthenticated requests should return 401 Unauthorized
-#     Updating courses requires admin privileges, so authentication is mandatory.
-#     """
-#     # Act: Make request without authentication headers
-#     response = await client.patch("/api/courses/1", json={"title": "Bruh New"})
+    Contract:
+        - Input: Unauthenticated request
+        - Behavior: Should return 401 Unauthorized
+        - Output: 401 status code
+        - Errors: None
+    """
+    # Act: Make request without authentication headers
+    response = await client.patch("/api/modules/1", json={"title": "Bruh New"})
 
-#     # Assert: Should return 401 Unauthorized
-#     assert response.status_code == 401
+    # Assert: Should return 401 Unauthorized
+    assert response.status_code == 401
 
 
-# @pytest.mark.asyncio
-# async def test_update_course_not_found(client: AsyncClient, auth_headers, admin_user):
-#     """
-#     Test that PATCH /api/courses/{id} returns 404 for non-existent course
+@pytest.mark.asyncio
+async def test_update_module_needs_admin(
+    client: AsyncClient, regular_user_auth_headers
+):
+    """
+    Test that PATCH /api/modules/{id} requires admin privileges
 
-#     Contract: When updating a course that doesn't exist:
-#     - Status: 404 Not Found
-#     - Response: Error message indicating course not found
-#     """
-#     # Act: Make authenticated request to update non-existent course
-#     response = await client.patch(
-#         "/api/courses/99999", json={"title": "Bruh New"}, headers=auth_headers
-#     )
+    Contract:
+        - Input: Authenticated request from non-admin user
+        - Behavior: Should return 403 Forbidden
+        - Output: 403 status code
+        - Errors: None
+    """
+    # Act: Make authenticated request from regular user to update module
+    response = await client.patch(
+        "/api/modules/1",
+        json={"title": "New New Name"},
+        headers=regular_user_auth_headers,
+    )
 
-#     # Assert: Should return 404 Not Found
-#     assert response.status_code == 404
+    # Assert: Should return 403 Forbidden for regular user
+    assert response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_update_module_not_found(client: AsyncClient, auth_headers, admin_user):
+    """
+    Test that PATCH /api/modules/{id} returns 404 for non-existent module
+
+    Contract:
+        - Input: Authenticated request with non-existent module ID
+        - Behavior: Should return 404 Not Found
+        - Output: 404 status code
+        - Errors: Module not found
+    """
+    # Act: Make authenticated request to update non-existent module
+    response = await client.patch(
+        "/api/modules/99999", json={"title": "Bruh New"}, headers=auth_headers
+    )
+
+    # Assert: Should return 404 Not Found
+    assert response.status_code == 404
 
 
 @pytest.mark.asyncio
@@ -417,10 +516,11 @@ async def test_update_module_success(
     """
     Test that PATCH /api/modules/{id} updates a module successfully
 
-    Contract: When updating a module with valid data:
-    - Status: 200 OK
-    - Response: Updated module object
-    - Changes should be persisted (verifiable via GET)
+    Contract:
+        - Input: Authenticated request with valid update data
+        - Behavior: Should update the module and return its details
+        - Output: 200 OK with updated module object
+        - Errors: None
     """
     # Arrange: Prepare update data
     updated_data = {
@@ -463,39 +563,64 @@ async def test_update_module_success(
 
 
 ###############################################################################
-# DELETE - delete_course tests
+# DELETE - delete_module tests
 ###############################################################################
 
 
-# @pytest.mark.asyncio
-# async def test_delete_course_requires_auth(client: AsyncClient):
-#     """
-#     Test that DELETE /api/courses/{id} requires authentication
+@pytest.mark.asyncio
+async def test_delete_module_requires_auth(client: AsyncClient):
+    """
+    Test that DELETE /api/modules/{id} requires authentication
 
-#     Contract: Unauthenticated requests should return 401 Unauthorized
-#     Deleting courses requires admin privileges, so authentication is mandatory.
-#     """
-#     # Act: Make request without authentication headers
-#     response = await client.delete("/api/courses/1")
+    Contract:
+        - Input: Unauthenticated request
+        - Behavior: Should return 401 Unauthorized
+        - Output: 401 status code
+        - Errors: None
+    """
+    # Act: Make request without authentication headers
+    response = await client.delete("/api/modules/1")
 
-#     # Assert: Should return 401 Unauthorized
-#     assert response.status_code == 401
+    # Assert: Should return 401 Unauthorized
+    assert response.status_code == 401
 
 
-# @pytest.mark.asyncio
-# async def test_delete_course_not_found(client: AsyncClient, auth_headers, admin_user):
-#     """
-#     Test that DELETE /api/courses/{id} returns 404 for non-existent course
+@pytest.mark.asyncio
+async def test_delete_module_needs_admin(
+    client: AsyncClient, regular_user_auth_headers
+):
+    """
+    Test that DELETE /api/modules/{id} requires admin privileges
 
-#     Contract: When deleting a course that doesn't exist:
-#     - Status: 404 Not Found
-#     - Response: Error message indicating course not found
-#     """
-#     # Act: Make authenticated request to delete non-existent course
-#     response = await client.delete("/api/courses/99999", headers=auth_headers)
+    Contract:
+        - Input: Authenticated request from non-admin user
+        - Behavior: Should return 403 Forbidden
+        - Output: 403 status code
+        - Errors: None
+    """
+    # Act: Make authenticated request by regular user to delete module
+    response = await client.delete("/api/modules/1", headers=regular_user_auth_headers)
 
-#     # Assert: Should return 404 Not Found
-#     assert response.status_code == 404
+    # Assert: Should return 403 Forbidden for regular user
+    assert response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_delete_module_not_found(client: AsyncClient, auth_headers, admin_user):
+    """
+    Test that DELETE /api/modules/{id} returns 404 for non-existent module
+
+    Contract:
+        - Input: Authenticated request with non-existent module ID
+        - Behavior: Should return 404 Not Found
+        - Output: 404 status code
+        - Errors: Module not found
+    """
+    # Act: Make authenticated request to delete non-existent module
+    response = await client.delete("/api/modules/99999", headers=auth_headers)
+
+    # Assert: Should return 404 Not Found
+    assert response.status_code == 404
 
 
 @pytest.mark.asyncio
@@ -505,9 +630,11 @@ async def test_delete_module_success(
     """
     Test that DELETE /api/modules/{id} deletes a module successfully
 
-    Contract: When deleting an existing module:
-    - Status: 204 No Content
-    - Module should no longer be retrievable via GET
+    Contract:
+        - Input: Authenticated request to delete an existing module
+        - Behavior: Should delete the module
+        - Output: 204 No Content
+        - Errors: None
     """
     # Act: Make authenticated request to delete existing module
     response = await client.delete(
