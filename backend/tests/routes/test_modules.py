@@ -217,7 +217,7 @@ async def test_get_modules_not_empty(
 
 
 ###############################################################################
-# GET - get_module tests
+# GET - get_module/{id} tests
 ###############################################################################
 
 
@@ -342,6 +342,34 @@ async def test_create_module_needs_auth(client: AsyncClient):
 
 
 @pytest.mark.asyncio
+async def test_create_module_needs_admin(
+    client: AsyncClient, regular_user_auth_headers
+):
+    """
+    Test that POST /api/modules requires admin privileges
+
+    Contract:
+        - Input: Authenticated request from non-admin user
+        - Behavior: Should return 403 Forbidden
+        - Output: 403 status code
+        - Errors: None
+    """
+    # Arrange: Prepare module data with valid format
+    module_data = {
+        "title": "Suauce",
+        "description": "Bruh Bruh Bruh",
+    }
+
+    # Act: Make authenticated request from regular user
+    response = await client.post(
+        "/api/modules", json=module_data, headers=regular_user_auth_headers
+    )
+
+    # Assert: Should return 403 Forbidden for regular user
+    assert response.status_code == 403
+
+
+@pytest.mark.asyncio
 async def test_create_module_invalid_input(
     client: AsyncClient, auth_headers, admin_user
 ):
@@ -438,6 +466,30 @@ async def test_update_module_requires_auth(client: AsyncClient):
 
 
 @pytest.mark.asyncio
+async def test_update_module_needs_admin(
+    client: AsyncClient, regular_user_auth_headers
+):
+    """
+    Test that PATCH /api/modules/{id} requires admin privileges
+
+    Contract:
+        - Input: Authenticated request from non-admin user
+        - Behavior: Should return 403 Forbidden
+        - Output: 403 status code
+        - Errors: None
+    """
+    # Act: Make authenticated request from regular user to update module
+    response = await client.patch(
+        "/api/modules/1",
+        json={"title": "New New Name"},
+        headers=regular_user_auth_headers,
+    )
+
+    # Assert: Should return 403 Forbidden for regular user
+    assert response.status_code == 403
+
+
+@pytest.mark.asyncio
 async def test_update_module_not_found(client: AsyncClient, auth_headers, admin_user):
     """
     Test that PATCH /api/modules/{id} returns 404 for non-existent module
@@ -531,6 +583,26 @@ async def test_delete_module_requires_auth(client: AsyncClient):
 
     # Assert: Should return 401 Unauthorized
     assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_delete_module_needs_admin(
+    client: AsyncClient, regular_user_auth_headers
+):
+    """
+    Test that DELETE /api/modules/{id} requires admin privileges
+
+    Contract:
+        - Input: Authenticated request from non-admin user
+        - Behavior: Should return 403 Forbidden
+        - Output: 403 status code
+        - Errors: None
+    """
+    # Act: Make authenticated request by regular user to delete module
+    response = await client.delete("/api/modules/1", headers=regular_user_auth_headers)
+
+    # Assert: Should return 403 Forbidden for regular user
+    assert response.status_code == 403
 
 
 @pytest.mark.asyncio
