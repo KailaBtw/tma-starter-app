@@ -75,7 +75,7 @@ async def test_get_all_courses_success(client: AsyncClient, auth_headers, admin_
     - Input: Authenticated request with admin privileges
     - Behavior: Should return a list of all courses in the db
     - Output: 200 OK with a list of courses (could be empty)
-    - Errors: the list could be empty 
+    - Errors: the list could be empty
     """
     # Act: Make authenticated request
     response = await client.get("/api/courses", headers=auth_headers)
