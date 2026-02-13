@@ -30,8 +30,7 @@ from tests.conftest import TestSessionLocal
 @pytest.fixture
 async def test_course(test_db):
     """
-    Create a test course in the database
-
+    Create a test course in the database.
     """
     async with TestSessionLocal() as session:
         course = Course(
@@ -52,10 +51,13 @@ async def test_course(test_db):
 @pytest.mark.asyncio
 async def test_get_all_courses_needs_auth(client: AsyncClient):
     """
-    Test that GET /api/courses requires authentication
+    Test that GET /api/courses requires authentication.
 
-    Contract: Unauthenticated requests should return 401 Unauthorized
-    This is a security requirement - courses endpoint should be protected.
+    Contract:
+    - Input: Unauthenticated request
+    - Behavior: should return 401 Unauthorized
+    - Output: 401 status code
+    - Errors: None
     """
     # Act: Make request without authentication headers
     response = await client.get("/api/courses")
@@ -67,11 +69,13 @@ async def test_get_all_courses_needs_auth(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_get_all_courses_success(client: AsyncClient, auth_headers, admin_user):
     """
-    Test that GET /api/courses returns list of accessible courses when authenticated
+    Test that GET /api/courses returns list of accessible courses when authenticated and admin. # noqa E501
 
-    Contract: Authenticated users can retrieve all accessible courses
-    - Status: 200 OK
-    - Response: List of course objects (could be empty)
+    Contract:
+    - Input: Authenticated request with admin privileges
+    - Behavior: Should return a list of all courses in the db
+    - Output: 200 OK with a list of courses (could be empty)
+    - Errors: the list could be empty
     """
     # Act: Make authenticated request
     response = await client.get("/api/courses", headers=auth_headers)
@@ -91,8 +95,11 @@ async def test_get_all_courses_not_empty(
     """
     Test that GET /api/courses returns *non-empty* list when courses exist
 
-    Contract: When courses exist in the system:
-    - Status: 200 OK
+    Contract:
+    - Input: Authenticated request with admin privs
+    - Behavior: Should return a list of all courses in the db (with at least one entry) # noqa E501
+    - Output: 200 OK with a non-empty list of courses
+    - Errors: Course list is empty, or course has missing/unexpected fields
     """
     # Act: Make authenticated request
     response = await client.get("/api/courses", headers=auth_headers)
@@ -118,7 +125,7 @@ async def test_get_all_courses_not_empty(
 
 
 ###############################################################################
-# GET - get_course tests
+# GET - get_course/{id} tests
 ###############################################################################
 
 
@@ -127,8 +134,11 @@ async def test_get_course_by_id_needs_auth(client: AsyncClient):
     """
     Test that GET /api/courses/{id} requires authentication
 
-    Contract: Unauthenticated requests should return 401 Unauthorized
-    Even with a valid course ID, needs auth.
+    Contract:
+    - Input: Unauthenticated request for a specific course ID
+    - Behavior: returns 401 status code
+    - Output: 401 status code
+    - Errors: None
     """
     # Act: Make request without authentication headers
     response = await client.get("/api/courses/1")
@@ -142,9 +152,11 @@ async def test_get_course_by_id_not_found(client: AsyncClient, auth_headers):
     """
     Test that GET /api/courses/{id} returns 404 for non-existent course
 
-    Contract: When requesting a course that doesn't exist:
-    - Status: 404 Not Found
-    - Response: Error message indicating course not found
+    Contract:
+    - Input: Authenticated request for a course ID that doesn't exist
+    - Behavior: returns 404 status and error message
+    - Output: 404 Not found
+    - Errors: None
     """
     # Act: Request a course ID that doesn't exist
     response = await client.get("/api/courses/99999", headers=auth_headers)
@@ -162,9 +174,11 @@ async def test_get_course_by_id_success(client: AsyncClient, auth_headers, test_
     """
     Test that GET /api/courses/{id} returns course details when authenticated
 
-    Contract: When requesting an existing course:
-    - Status: 200 OK
-    - Response: Course object with expected fields
+    Contract:
+    - Input: Authenticated request for an existing course ID
+    - Behavior: returns 200 status and course details
+    - Output: 200 OK with course object
+    - Errors: Course has missing/unexpected fields, or no course returned
     """
     # Act: Request a course ID that exists
     response = await client.get(f"/api/courses/{test_course.id}", headers=auth_headers)
@@ -194,8 +208,11 @@ async def test_create_course_needs_auth(client: AsyncClient):
     """
     Test that POST /api/courses requires authentication
 
-    Contract: Unauthenticated requests should return 401 Unauthorized
-    Creating courses requires admin privileges.
+    Contract:
+    - Input: Unauthenticated request with valid course data
+    - Behavior: Should return a 401
+    - Output: 401 Unauthorized
+    - Errors: None
     """
     # Arrange: Prepare course data valid format
     course_data = {
@@ -219,11 +236,11 @@ async def test_create_course_invalid_input(
     """
     Test that POST /api/courses returns 422 for missing required fields
 
-    Contract: When creating a course with missing required fields:
-    - Status: 422 Unprocessable Entity
-    - This tests input validation - the API should reject invalid input
-
-    Note: Even with authentication, invalid data should be rejected
+    Contract:
+    - Input: Authenticated request with invalid course data
+    - Behavior: Should return a 422
+    - Output: 422 Status code
+    - Errors: None
     """
     course_data = {
         # "title" is missing
@@ -244,12 +261,11 @@ async def test_create_course_success(
     """
     Test that POST /api/courses creates a course successfully
 
-    Contract: When creating a course with valid data:
-    - Status: 201 Created
-    - Response: Course object with id and provided fields
-    - Course should be retrievable via GET /api/courses/{id}
-
-    Note: test_db fixture ensures fresh database for each test
+    Contract:
+    - Input: Authenticated request with valid data
+    - Behavior: create the course and return 201 and add to db
+    - Output: 201 Created with course object
+    - Errors: Course has missing/unexpected fields, course not persisted, or course retrieved has wrong data # noqa E501
     """
     course_data = {
         "title": "Suauce",
@@ -301,8 +317,11 @@ async def test_update_course_requires_auth(client: AsyncClient):
     """
     Test that PATCH /api/courses/{id} requires authentication
 
-    Contract: Unauthenticated requests should return 401 Unauthorized
-    Updating courses requires admin privileges, so authentication is mandatory.
+    Contract:
+    - Input: Unauthenticated request
+    - Behavior: Should return 401
+    - Output: 401 Unauthorized
+    - Errors: None
     """
     # Act: Make request without authentication headers
     response = await client.patch("/api/courses/1", json={"title": "Bruh New"})
@@ -316,9 +335,11 @@ async def test_update_course_not_found(client: AsyncClient, auth_headers, admin_
     """
     Test that PATCH /api/courses/{id} returns 404 for non-existent course
 
-    Contract: When updating a course that doesn't exist:
-    - Status: 404 Not Found
-    - Response: Error message indicating course not found
+    Contract:
+    - Input: Authenticated request for a course ID that doesn't exist
+    - Behavior: return 404 status code
+    - Output: 404 Not Found
+    - Errors: None
     """
     # Act: Make authenticated request to update non-existent course
     response = await client.patch(
@@ -336,10 +357,11 @@ async def test_update_course_success(
     """
     Test that PATCH /api/courses/{id} updates a course successfully
 
-    Contract: When updating a course with valid data:
-    - Status: 200 OK
-    - Response: Updated course object
-    - Changes should be persisted (verifiable via GET)
+    Contract:
+    - Input: Authenticated request with valid new data and existing course ID
+    - Behavior: Update the course and return 200 with updated course data
+    - Output: 200 OK and updated course object
+    - Errors: Course has missing/unexpected fields, updates not persisted, or course retrieved has wrong data # noqa E501
     """
     # Arrange: Prepare update data
     updated_data = {
@@ -391,8 +413,11 @@ async def test_delete_course_requires_auth(client: AsyncClient):
     """
     Test that DELETE /api/courses/{id} requires authentication
 
-    Contract: Unauthenticated requests should return 401 Unauthorized
-    Deleting courses requires admin privileges, so authentication is mandatory.
+    Contract:
+    - Input: Unauthenticated request
+    - Behavior: Should return 401
+    - Output: 401 Unauthorized
+    - Errors: None
     """
     # Act: Make request without authentication headers
     response = await client.delete("/api/courses/1")
@@ -406,9 +431,11 @@ async def test_delete_course_not_found(client: AsyncClient, auth_headers, admin_
     """
     Test that DELETE /api/courses/{id} returns 404 for non-existent course
 
-    Contract: When deleting a course that doesn't exist:
-    - Status: 404 Not Found
-    - Response: Error message indicating course not found
+    Contract:
+    - Input: Authenticated request for a course ID that doesn't exist
+    - Behavior: return a 404 status code
+    - Output: 404 Not Found
+    - Errors: None
     """
     # Act: Make authenticated request to delete non-existent course
     response = await client.delete("/api/courses/99999", headers=auth_headers)
@@ -424,9 +451,11 @@ async def test_delete_course_success(
     """
     Test that DELETE /api/courses/{id} deletes a course successfully
 
-    Contract: When deleting an existing course:
-    - Status: 204 No Content
-    - Course should no longer be retrievable via GET
+    Contract:
+    - Input: Authenticated request for an existing course ID
+    - Behavior: Delete the course and return a 204 No Content
+    - Output: 204 No Content
+    - Errors: Course not deleted, or course still retrievable after deletion
     """
     # Act: Make authenticated request to delete existing course
     response = await client.delete(
