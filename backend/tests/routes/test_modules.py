@@ -313,6 +313,47 @@ async def test_get_module_by_id_success(client: AsyncClient, auth_headers, test_
     # Todo: Add more field checks as needed
 
 
+@pytest.mark.asyncio
+async def test_get_module_by_id_regular_user_accessible(
+    client: AsyncClient, regular_user_auth_headers, modules_with_enrollments
+):
+    """
+    Regular user GET /api/modules/{id} returns 200 for a module in their enrolled course.
+
+    Contract:
+        - regular_user is enrolled only in course_a; module_a1 is in course_a
+        - GET module_a1 as regular user → 200 with module details
+    """
+    mods = modules_with_enrollments
+    response = await client.get(
+        f"/api/modules/{mods['module_a1'].id}", headers=regular_user_auth_headers
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["id"] == mods["module_a1"].id
+    assert data["title"] == mods["module_a1"].title
+
+
+@pytest.mark.asyncio
+async def test_get_module_by_id_regular_user_forbidden(
+    client: AsyncClient, regular_user_auth_headers, modules_with_enrollments
+):
+    """
+    Regular user GET /api/modules/{id} returns 404 for a module not in their courses.
+
+    Contract:
+        - regular_user is enrolled only in course_a; module_b1 is in course_b
+        - GET module_b1 as regular user → 404 (module not found / not accessible)
+    """
+    mods = modules_with_enrollments
+    response = await client.get(
+        f"/api/modules/{mods['module_b1'].id}", headers=regular_user_auth_headers
+    )
+    assert response.status_code == 404
+    data = response.json()
+    assert "not found" in data["detail"].lower()
+
+
 ###############################################################################
 # POST - create_module tests
 ###############################################################################
