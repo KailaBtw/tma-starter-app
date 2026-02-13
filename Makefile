@@ -2,35 +2,35 @@
 
 
 # backend
-backend-check:
+check-backend:
 	$(MAKE) -C backend check
 
-backend-fix:
+fix-backend:
 	$(MAKE) -C backend fix
 
-backend-test:
+test-backend:
 	$(MAKE) -C backend test
 
 
 # mobile
-mobile-check:
+check-mobile:
 	$(MAKE) -C mobile check
 
-mobile-fix:
+fix-mobile:
 	$(MAKE) -C mobile fix
 
-mobile-test:
+test-mobile:
 	$(MAKE) -C mobile test
 
 
 # frontend
-ui-check:
+check-ui:
 	$(MAKE) -C ui check
 
-ui-fix:
+fix-ui:
 	$(MAKE) -C ui fix
 
-ui-test:
+test-ui:
 	$(MAKE) -C ui test
 
 
