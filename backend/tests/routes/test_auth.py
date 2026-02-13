@@ -561,5 +561,5 @@ async def test_disable_user_success(client: AsyncClient, auth_headers, regular_u
     assert response.status_code == 200
 
     #  What else needs to be added here?
-    assert data["is_active"] == False
+    assert data["is_active"] is False
     assert data["username"] != "admin"

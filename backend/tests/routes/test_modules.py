@@ -318,7 +318,8 @@ async def test_get_module_by_id_regular_user_accessible(
     client: AsyncClient, regular_user_auth_headers, modules_with_enrollments
 ):
     """
-    Regular user GET /api/modules/{id} returns 200 for a module in their enrolled course.
+    Regular user GET /api/modules/{id} returns 200
+    for a module in their enrolled course.
 
     Contract:
         - regular_user is enrolled only in course_a; module_a1 is in course_a

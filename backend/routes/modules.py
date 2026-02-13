@@ -96,7 +96,8 @@ async def get_module(
 ):
     """
     Get a single module by ID.
-    Admins can get any module. Regular users can only get modules from courses they are enrolled in.
+    Admins can get any module. Regular users can only
+    get modules from courses they are currently enrolled in.
     """
     result = await db.execute(select(Module).where(Module.id == module_id))
     module = result.scalar_one_or_none()
