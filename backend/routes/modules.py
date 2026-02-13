@@ -96,6 +96,8 @@ async def get_module(
 ):
     """
     Get a single module by ID.
+    Admins can get any module. Regular users can only
+    get modules from courses they are currently enrolled in.
     """
     result = await db.execute(select(Module).where(Module.id == module_id))
     module = result.scalar_one_or_none()
@@ -104,6 +106,27 @@ async def get_module(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Module not found"
         )
+
+    # Admins can access any module
+    if current_user.role.name != "admin":
+        # Regular users: only if module is in one of their enrolled courses
+        course_ids_result = await db.execute(
+            select(CourseUser.course_id).where(CourseUser.user_id == current_user.id)
+        )
+        course_ids = [row[0] for row in course_ids_result.all()]
+        if not course_ids:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Module not found"
+            )
+        link_result = await db.execute(
+            select(CourseModule)
+            .where(CourseModule.module_id == module_id)
+            .where(CourseModule.course_id.in_(course_ids))
+        )
+        if link_result.scalars().first() is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Module not found"
+            )
 
     return module
 

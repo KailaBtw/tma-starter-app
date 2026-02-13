@@ -421,7 +421,6 @@ async def test_get_me_success(client: AsyncClient, auth_headers, admin_user):
 
     # Assert: Response should be a list
     data = response.json()
-    # assert isinstance(data, list)
 
     # Assert: List should contain data
     assert len(data) >= 1
@@ -452,12 +451,12 @@ async def test_disable_user_requires_auth(
     #    user_id: int
     #    is_active: bool
     user_data = {
-        "user_id": "2",
-        "is_active": "false",
+        "user_id": 2,
+        "is_active": False,
     }
 
     # Act: Make request without authentication headers
-    response = await client.patch("api/auth/users/disable", json=user_data)
+    response = await client.patch("/api/auth/users/disable", json=user_data)
     # Assert: Should return 401 (Unauthorized)
     assert response.status_code == 401
 
@@ -478,7 +477,7 @@ async def test_disable_user_requires_admin(
     }
     # Act: Make request with regular user headers
     response = await client.patch(
-        "api/auth/users/disable", json=user_data, headers=regular_user_auth_headers
+        "/api/auth/users/disable", json=user_data, headers=regular_user_auth_headers
     )
     # Assert: Should return 403 (Forbidden)
     assert response.status_code == 403
@@ -498,7 +497,7 @@ async def test_disable_self_fails(client: AsyncClient, auth_headers):
     }
     # Act: Make request without authentication headers
     response = await client.patch(
-        "api/auth/users/disable", json=user_data, headers=auth_headers
+        "/api/auth/users/disable", json=user_data, headers=auth_headers
     )
     # Assert: Should return 400: bad request (trying to disable your own account)
     assert response.status_code == 400
@@ -518,7 +517,7 @@ async def test_disable_fake_account_fails(client: AsyncClient, auth_headers):
     }
     # Act: Make bad request
     response = await client.patch(
-        "api/auth/users/disable", json=user_data, headers=auth_headers
+        "/api/auth/users/disable", json=user_data, headers=auth_headers
     )
     # Assert: Should return 404: (user not found)
     assert response.status_code == 404
@@ -529,16 +528,16 @@ async def test_disable_user_success(client: AsyncClient, auth_headers, regular_u
     """
     Test that PATCH /api/auth/users/disable
 
-    Contract: errors out if trying to disable a non-existent user
+    Contract: admin accounts can disable a standard user account
     """
     # Prepare request body (valid format)
     user_data = {
         "user_id": "2",
         "is_active": "false",
     }
-    # Act: Make bad request
+    # Act: Make good request
     response = await client.patch(
-        "api/auth/users/disable", json=user_data, headers=auth_headers
+        "/api/auth/users/disable", json=user_data, headers=auth_headers
     )
     # Assert: Should return 200
     assert response.status_code == 200
@@ -554,5 +553,13 @@ async def test_disable_user_success(client: AsyncClient, auth_headers, regular_u
     assert data["role"]["name"] == "user"
     assert data["username"] == "user"  # the correct user
 
-    # verify disable went through
+    # verify disable in the response
     assert data["is_active"] is False
+
+    response = await client.get("/api/users/2", headers=auth_headers)
+    data = response.json()
+    assert response.status_code == 200
+
+    #  What else needs to be added here?
+    assert data["is_active"] is False
+    assert data["username"] != "admin"
