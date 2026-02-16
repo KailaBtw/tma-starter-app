@@ -12,7 +12,6 @@ import {
     SimpleGrid,
 } from '@mantine/core';
 import { IconUsersGroup, IconUser } from '@tabler/icons-react';
-import { useAuth } from '../../contexts/AuthContext';
 import { useViewMode } from '../../hooks/useViewMode';
 import { getGroup } from '../../utils/api';
 import { formatLastActive } from '../../utils/dateUtils';
@@ -46,7 +45,6 @@ function getRoleBadgeColor(role: string | undefined): string {
 
 export default function UserGroupDetailPage() {
     const { groupId } = useParams<{ groupId: string }>();
-    const { API_URL } = useAuth();
     const [viewMode] = useViewMode();
     const [group, setGroup] = useState<GroupDetail | null>(null);
     const [loading, setLoading] = useState(true);
@@ -64,7 +62,7 @@ export default function UserGroupDetailPage() {
         setLoading(true);
         setError(null);
         try {
-            const groupData = await getGroup(Number(groupId), API_URL);
+            const groupData = await getGroup(Number(groupId));
             setGroup(groupData);
         } catch (err) {
             const errorMessage =

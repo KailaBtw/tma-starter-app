@@ -10,7 +10,6 @@ import {
     Alert,
 } from '@mantine/core';
 import { IconUsersGroup } from '@tabler/icons-react';
-import { useAuth } from '../../contexts/AuthContext';
 import { getGroups, getGroup } from '../../utils/api';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import UserPageLayout from '../../components/layout/UserPageLayout';
@@ -22,7 +21,6 @@ interface GroupWithMemberCount extends GroupType {
 
 export default function UserGroupsPage() {
     const navigate = useNavigate();
-    const { API_URL } = useAuth();
     const [groups, setGroups] = useState<GroupWithMemberCount[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -37,13 +35,13 @@ export default function UserGroupsPage() {
         setError(null);
         try {
             // Fetch user's groups
-            const groupsData = await getGroups(API_URL);
+            const groupsData = await getGroups();
 
             // Verify each group is accessible
             const verifiedGroups: GroupWithMemberCount[] = [];
             for (const group of groupsData) {
                 try {
-                    const groupDetail = await getGroup(group.id, API_URL);
+                    const groupDetail = await getGroup(group.id);
                     verifiedGroups.push({
                         ...group,
                         member_count: groupDetail.members?.length || 0,

@@ -1,6 +1,5 @@
 import { Stack, Text, Alert, Card, SimpleGrid } from '@mantine/core';
 import { IconBook } from '@tabler/icons-react';
-import { useAuth } from '../../contexts/AuthContext';
 import { getCourses } from '../../utils/api';
 import { useState, useEffect } from 'react';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
@@ -8,7 +7,6 @@ import UserPageLayout from '../../components/layout/UserPageLayout';
 import type { Course } from '../../types/api';
 
 export default function UserCoursesPage() {
-    const { API_URL } = useAuth();
     const [courses, setCourses] = useState<Course[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -23,7 +21,7 @@ export default function UserCoursesPage() {
         setError(null);
         try {
             // Fetch user's courses (filtered by groups)
-            const coursesData = await getCourses(API_URL);
+            const coursesData = await getCourses();
             setCourses(coursesData);
         } catch (err) {
             const errorMessage =

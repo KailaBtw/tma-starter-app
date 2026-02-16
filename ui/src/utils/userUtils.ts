@@ -4,6 +4,8 @@
  * @param apiUrl - Base API URL
  * @returns Full avatar URL or null
  */
+import { getApiUrl } from './apiClient';
+
 export function getAvatarUrl(
     avatarUrl: string | null | undefined,
     apiUrl: string
@@ -52,7 +54,7 @@ export function getRoleBadgeColor(roleName: string): string {
  */
 export async function buildUserGroupsMap(
     groups: Array<{ id: number; name: string }>,
-    apiUrl: string
+    apiUrl = getApiUrl()
 ): Promise<Record<number, string[]>> {
     const { getGroup } = await import('./api');
     const userGroupsMap: Record<number, string[]> = {};

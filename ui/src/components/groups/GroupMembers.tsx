@@ -77,7 +77,7 @@ export default function GroupMembers({
         setLoading(true);
         setError(null);
         try {
-            const updatedGroup = await getGroup(group.id, API_URL);
+            const updatedGroup = await getGroup(group.id);
             setMembers(updatedGroup.members || []);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Unknown error');
@@ -99,7 +99,7 @@ export default function GroupMembers({
         setError(null);
 
         try {
-            await removeMemberFromGroup(group.id, userId, API_URL);
+            await removeMemberFromGroup(group.id, userId);
             await fetchMembers();
             if (onUpdate) onUpdate();
         } catch (err) {

@@ -40,13 +40,13 @@ export default function UsersPage() {
         setError(null);
         try {
             const [usersData, groupsData] = await Promise.all([
-                getAllUsers(API_URL),
-                getGroups(API_URL),
+                getAllUsers(),
+                getGroups(),
             ]);
             setUsers(usersData);
 
             // Build user groups mapping
-            const userGroupsMap = await buildUserGroupsMap(groupsData, API_URL);
+            const userGroupsMap = await buildUserGroupsMap(groupsData);
             setUserGroups(userGroupsMap);
         } catch (err) {
             const errorMessage =

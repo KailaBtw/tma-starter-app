@@ -11,7 +11,7 @@ import type { CourseUpdate, CourseDetail } from '../../types/api';
 
 export default function CourseDetailPage() {
     const { courseId } = useParams<{ courseId: string }>();
-    const { API_URL, userInfo } = useAuth();
+    const { userInfo } = useAuth();
     const [editModalOpened, { open: openEditModal, close: closeEditModal }] =
         useDisclosure(false);
 
@@ -30,7 +30,7 @@ export default function CourseDetailPage() {
         setLoading(true);
         setError(null);
         try {
-            const courseData = await getCourse(Number(courseId), API_URL);
+            const courseData = await getCourse(Number(courseId));
             setCourse(courseData);
         } catch (err) {
             const errorMessage =
@@ -76,7 +76,7 @@ export default function CourseDetailPage() {
                 description: courseDescription.trim() || null,
             };
 
-            await patchCourse(Number(courseId), updateData, API_URL);
+            await patchCourse(Number(courseId), updateData);
             closeEditModal();
             await fetchCourse();
         } catch (err) {
