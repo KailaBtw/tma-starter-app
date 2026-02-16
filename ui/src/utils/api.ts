@@ -14,6 +14,10 @@ import type {
     CourseDetail,
     CourseCreate,
     CourseUpdate,
+    Module,
+    ModuleDetail,
+    ModuleCreate,
+    ModuleUpdate,
 } from '../types/api.js';
 
 /**
@@ -466,3 +470,89 @@ export async function getGroupCourses(
     });
     return handleResponse<Course[]>(response) as Promise<Course[]>;
 }
+
+// ============================================================================
+// MODULE API Functions
+// ============================================================================
+
+/**
+ * Get all modules
+ * @param apiUrl - Base API URL
+ * @returns Array of modules
+ */
+export async function getModules(apiUrl = getApiUrl()): Promise<Module[]> {
+    const response = await fetch(`${apiUrl}/modules`, {
+        headers: getAuthHeaders(),
+    });
+    return handleResponse<Module[]>(response) as Promise<Module[]>;
+}
+
+/**
+ * Get a single module by its ID
+ * @param moduleId - Module ID
+ * @param apiUrl - Base API URL
+ * @returns Module object
+ */
+export async function getModule(
+    moduleId: number,
+    apiUrl = getApiUrl()
+): Promise<ModuleDetail> {
+    const response = await fetch(`${apiUrl}/modules/${moduleId}`, {
+        headers: getAuthHeaders(),
+    });
+    return handleResponse<ModuleDetail>(response) as Promise<ModuleDetail>;
+}
+
+/**
+ * Create a new module
+ * @param moduleData - Module data (title (required), description (optional))
+ * @param apiUrl - Base API URL
+ * @returns Created module object
+ */
+export async function createModule(
+    moduleData: ModuleCreate,
+    apiUrl = getApiUrl()
+): Promise<Module> {
+    const response = await fetch(`${apiUrl}/modules`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(moduleData),
+    });
+    return handleResponse<Module>(response) as Promise<Module>;
+}
+
+/**
+ * Update a Module
+ * @param moduleId - Module ID
+ * @param moduleData - Optional module data (title and description are optional)
+ * @param apiUrl - Base API URL
+ * @returns updated module object
+ */
+export async function patchModule(
+    moduleId: number,
+    moduleData: ModuleUpdate,
+    apiUrl = getApiUrl()
+): Promise<Module> {
+    const response = await fetch(`${apiUrl}/modules/${moduleId}`, {
+        method: 'PATCH',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(moduleData),
+    });
+    return handleResponse<Module>(response) as Promise<Module>;
+}
+
+export async function deleteModule(
+    moduleId: number,
+    apiUrl = getApiUrl()
+): Promise<void> {
+    const response = await fetch(`${apiUrl}/modules/${moduleId}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders(),
+    });
+    if (!response.ok) {
+        throw new Error(`Failed to delete module: ${response.statusText}`);
+    }
+}
+
+// TODO: Set up the endpoint to get all posts associated with a module
+// The route isn't set up yet, so I can't really make this util
