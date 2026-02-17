@@ -43,3 +43,8 @@ Thumbs.db
 *.log
 context
 curriculum
+
+# Coverage
+coverage/
+*.lcov
+*.lcov.info
