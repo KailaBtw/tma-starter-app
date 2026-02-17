@@ -7,6 +7,10 @@ export interface Age {
     months: number;
 }
 
+const MINUTE: number = 60_000;
+const HOUR: number = 60 * MINUTE;
+const DAY: number = 24 * HOUR;
+
 /**
  * Format age object (with years and months) into a readable string
  * @param age - Age object with { years: number, months: number }
@@ -60,9 +64,9 @@ export function formatLastActive(
     const isToday = dateDay.getTime() === today.getTime();
 
     if (isToday) {
-        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+        const diffHours = Math.floor(diffMs / HOUR);
         if (diffHours === 0) {
-            const diffMins = Math.floor(diffMs / (1000 * 60));
+            const diffMins = Math.floor(diffMs / MINUTE);
             return diffMins <= 1 ? 'Just now' : `${diffMins} minutes ago`;
         }
         return diffHours === 1 ? '1 hour ago' : `${diffHours} hours ago`;
