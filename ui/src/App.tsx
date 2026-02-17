@@ -27,6 +27,10 @@ import GroupDetailPage from './pages/groups/GroupDetailPage.tsx';
 import HomePage from './pages/common/HomePage';
 import UnauthorizedPage from './pages/common/UnauthorizedPage.tsx';
 import './globals.css';
+import ModulePage from './pages/modules/ModulePage.tsx';
+import ModuleDetailPage from './pages/modules/ModuleDetailPage.tsx';
+import CreateModulePage from './pages/modules/CreateModulePage.tsx';
+import UserModulesPage from './pages/modules/UserModulesPage.tsx';
 
 export default function App() {
     return (
@@ -66,6 +70,38 @@ export default function App() {
                                 <ProtectedRoute requiredRole="admin">
                                     <Layout>
                                         <CourseDetailPage />
+                                    </Layout>
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/dashboard/modules"
+                            element={
+                                <ProtectedRoute requiredRole="admin">
+                                    <Layout>
+                                        {/* These pages don't exist yet, but the routes */}
+                                        {/* are set up, along with the protected pages */}
+                                        <ModulePage />
+                                    </Layout>
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/dashboard/modules/:moduleId"
+                            element={
+                                <ProtectedRoute requiredRole="admin">
+                                    <Layout>
+                                        <ModuleDetailPage />
+                                    </Layout>
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/dashboard/modules/new"
+                            element={
+                                <ProtectedRoute requiredRole="admin">
+                                    <Layout>
+                                        <CreateModulePage />
                                     </Layout>
                                 </ProtectedRoute>
                             }
@@ -148,6 +184,16 @@ export default function App() {
                                 <ProtectedRoute>
                                     <Layout>
                                         <UserCoursesPage />
+                                    </Layout>
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/dashboard/user/modules"
+                            element={
+                                <ProtectedRoute>
+                                    <Layout>
+                                        <UserModulesPage />
                                     </Layout>
                                 </ProtectedRoute>
                             }

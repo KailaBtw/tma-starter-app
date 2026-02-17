@@ -98,6 +98,31 @@ export interface CourseUpdate {
 }
 
 // ============================================================================
+// Module Types
+// ============================================================================
+export interface Module {
+    id: number; // all fields except id seem to be nullable
+    title: string;
+    description?: string | null;
+    created_at?: string | null;
+    updated_at?: string | null;
+}
+
+export interface ModuleDetail extends Module {
+    // Note: Posts should be added at some point
+}
+
+export interface ModuleCreate {
+    title: string;
+    description?: string | null;
+}
+
+export interface ModuleUpdate {
+    title?: string | null;
+    descriptio?: string | null;
+}
+
+// ============================================================================
 // Group Types
 // ============================================================================
 
