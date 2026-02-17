@@ -9,7 +9,6 @@ export interface Age {
 
 const MINUTE: number = 60_000;
 const HOUR: number = 60 * MINUTE;
-const DAY: number = 24 * HOUR;
 
 /**
  * Format age object (with years and months) into a readable string
