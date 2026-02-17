@@ -16,7 +16,6 @@ import {
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconPlus, IconBook } from '@tabler/icons-react';
-import { useAuth } from '../../contexts/AuthContext';
 import { getCourses, createCourse } from '../../utils/api';
 import { useViewMode } from '../../hooks/useViewMode';
 import { useTableSort } from '../../hooks/useTableSort';
@@ -27,7 +26,6 @@ import AdminPageLayout from '../../components/layout/AdminPageLayout';
 import type { Course, CourseCreate } from '../../types/api';
 
 export default function CoursesPage() {
-    const { API_URL } = useAuth();
     const navigate = useNavigate();
 
     const [courses, setCourses] = useState<Course[]>([]);
@@ -59,7 +57,7 @@ export default function CoursesPage() {
         setLoading(true);
         setError(null);
         try {
-            const data = await getCourses(API_URL);
+            const data = await getCourses();
             setCourses(data);
         } catch (err) {
             const errorMessage =
@@ -84,7 +82,7 @@ export default function CoursesPage() {
             // File upload functionality will be implemented by students
 
             // Create the course
-            await createCourse(courseData, API_URL);
+            await createCourse(courseData);
             setCourseTitle('');
             setCourseDescription('');
             closeCreateModal();

@@ -89,7 +89,7 @@ export default function GroupDetailPage() {
         setLoading(true);
         setError(null);
         try {
-            const groupData = await getGroup(Number(groupId), API_URL);
+            const groupData = await getGroup(Number(groupId));
             setGroup(groupData);
             // Initialize form state
             setGroupName(groupData.name);
@@ -110,7 +110,7 @@ export default function GroupDetailPage() {
         if (!groupId) return;
         setCoursesLoading(true);
         try {
-            const data = await getGroupCourses(Number(groupId), API_URL);
+            const data = await getGroupCourses(Number(groupId));
             setCourses(data);
         } catch (err) {
             console.error('Error fetching group courses:', err);
@@ -140,7 +140,7 @@ export default function GroupDetailPage() {
                 name: groupName.trim(),
                 description: groupDescription.trim() || null,
             };
-            await patchGroup(Number(groupId), updateData, API_URL);
+            await patchGroup(Number(groupId), updateData);
             closeEditModal();
             // Refresh group data
             await fetchGroup();

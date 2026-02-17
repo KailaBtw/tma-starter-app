@@ -47,13 +47,7 @@ interface CourseProgress {
     percentage: number;
 }
 
-interface UserGroupsAndCoursesProps {
-    API_URL: string;
-}
-
-export default function UserGroupsAndCourses({
-    API_URL,
-}: UserGroupsAndCoursesProps) {
+export default function UserGroupsAndCourses() {
     const navigate = useNavigate();
     const { userInfo } = useAuth();
     const [groups, setGroups] = useState<ApiGroup[]>([]);
@@ -74,7 +68,7 @@ export default function UserGroupsAndCourses({
         setError(null);
         try {
             // Fetch user's groups (backend filters to only groups user is a member of)
-            const groupsData = await getGroups(API_URL);
+            const groupsData = await getGroups();
 
             // Verify each group is accessible (defensive check)
             // The backend should already filter correctly, but we verify to be safe
@@ -82,7 +76,7 @@ export default function UserGroupsAndCourses({
             for (const group of groupsData) {
                 try {
                     // Try to access the group details - this will fail with 403 if user doesn't have access
-                    await getGroup(group.id, API_URL);
+                    await getGroup(group.id);
                     verifiedGroups.push(group);
                 } catch (err) {
                     // If we can't access this group, skip it and log a warning
@@ -99,10 +93,7 @@ export default function UserGroupsAndCourses({
             const courseGroupsData: CourseGroup[] = [];
             for (const group of verifiedGroups) {
                 try {
-                    const groupCourses = await getGroupCourses(
-                        group.id,
-                        API_URL
-                    );
+                    const groupCourses = await getGroupCourses(group.id);
                     groupCourses.forEach((course) => {
                         courseGroupsData.push({
                             course_id: course.id,
@@ -126,7 +117,7 @@ export default function UserGroupsAndCourses({
             );
 
             // Fetch all courses and filter to only accessible ones
-            const allCourses = await getCourses(API_URL);
+            const allCourses = await getCourses();
             const accessibleCourses = allCourses.filter((course) =>
                 accessibleCourseIds.has(course.id)
             );
