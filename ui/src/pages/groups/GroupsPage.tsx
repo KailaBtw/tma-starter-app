@@ -15,7 +15,6 @@ import {
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconPlus, IconBook } from '@tabler/icons-react';
-import { useAuth } from '../../contexts/AuthContext';
 import { getGroups, createGroup } from '../../utils/api';
 // InviteUser component removed - students will implement invite system
 import { useViewMode } from '../../hooks/useViewMode';
@@ -33,7 +32,6 @@ interface GroupWithCourses extends GroupType {
 }
 
 export default function GroupsPage() {
-    const { API_URL } = useAuth();
     const navigate = useNavigate();
 
     const [groups, setGroups] = useState<GroupWithCourses[]>([]);
@@ -75,7 +73,7 @@ export default function GroupsPage() {
         setLoading(true);
         setError(null);
         try {
-            const data = await getGroups(API_URL);
+            const data = await getGroups();
 
             // Course assignment will be implemented by students
             const groupsWithCourses = data.map((group) => ({
@@ -103,13 +101,10 @@ export default function GroupsPage() {
         setError(null);
 
         try {
-            await createGroup(
-                {
-                    name: groupName.trim(),
-                    description: groupDescription.trim() || null,
-                },
-                API_URL
-            );
+            await createGroup({
+                name: groupName.trim(),
+                description: groupDescription.trim() || null,
+            });
             setGroupName('');
             setGroupDescription('');
             closeCreateModal();

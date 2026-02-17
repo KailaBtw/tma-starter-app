@@ -13,14 +13,12 @@ import {
     Divider,
     Grid,
 } from '@mantine/core';
-import { useAuth } from '../../contexts/AuthContext';
 import { createUser } from '../../utils/api';
 import AdminPageLayout from '../../components/layout/AdminPageLayout';
 import type { UserCreate } from '../../types/api';
 
 export default function CreateUserPage() {
     const navigate = useNavigate();
-    const { API_URL } = useAuth();
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -55,7 +53,7 @@ export default function CreateUserPage() {
                 child_dob: childDob || null,
             };
 
-            await createUser(userData, API_URL);
+            await createUser(userData);
             // Navigate back to users list
             navigate('/dashboard/users');
         } catch (err) {

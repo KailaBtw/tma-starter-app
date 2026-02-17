@@ -94,7 +94,7 @@ export default function EditUserPage() {
 
     async function fetchGroups() {
         try {
-            const groups = await getGroups(API_URL);
+            const groups = await getGroups();
             setAllGroups(groups);
         } catch (err) {
             console.error('Failed to fetch groups:', err);
@@ -107,8 +107,8 @@ export default function EditUserPage() {
         setError(null);
         try {
             const [users, groups] = await Promise.all([
-                getAllUsers(API_URL),
-                getGroups(API_URL),
+                getAllUsers(),
+                getGroups(),
             ]);
 
             const foundUser = users.find((u) => u.id === parseInt(userId));
@@ -142,7 +142,7 @@ export default function EditUserPage() {
             const userGroupIds: string[] = [];
             for (const group of groups) {
                 try {
-                    const groupDetail = await getGroup(group.id, API_URL);
+                    const groupDetail = await getGroup(group.id);
                     if (groupDetail.members) {
                         const isMember = groupDetail.members.some(
                             (m) => m.user_id === foundUser.id
@@ -294,12 +294,12 @@ export default function EditUserPage() {
         try {
             // Update role if changed
             if (role !== user.role?.name) {
-                await updateUserRole(user.id, role, API_URL);
+                await updateUserRole(user.id, role);
             }
 
             // Update status if changed
             if (isActive !== user.is_active) {
-                await updateUserStatus(user.id, isActive, API_URL);
+                await updateUserStatus(user.id, isActive);
             }
 
             // Update profile fields
@@ -311,7 +311,7 @@ export default function EditUserPage() {
                 child_dob: childDob || null,
                 avatar_url: avatarUrl || null,
             };
-            await updateUserProfile(user.id, profileData, API_URL);
+            await updateUserProfile(user.id, profileData);
 
             // Update group memberships
             const groupsToAdd = selectedGroups.filter(
@@ -327,8 +327,7 @@ export default function EditUserPage() {
                     await addMemberToGroup(
                         parseInt(groupId),
                         user.id,
-                        'member',
-                        API_URL
+                        'member'
                     );
                 } catch (err) {
                     console.error(
@@ -341,11 +340,7 @@ export default function EditUserPage() {
             // Remove user from groups
             for (const groupId of groupsToRemove) {
                 try {
-                    await removeMemberFromGroup(
-                        parseInt(groupId),
-                        user.id,
-                        API_URL
-                    );
+                    await removeMemberFromGroup(parseInt(groupId), user.id);
                 } catch (err) {
                     console.error(
                         `Failed to remove user from group ${groupId}:`,
@@ -373,7 +368,7 @@ export default function EditUserPage() {
 
         try {
             // First disable the user
-            await updateUserStatus(user.id, false, API_URL);
+            await updateUserStatus(user.id, false);
             // TODO: Add delete user endpoint when backend supports it
             // For now, we'll just disable the user
             setError(

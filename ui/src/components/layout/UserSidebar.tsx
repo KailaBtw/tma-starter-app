@@ -65,7 +65,7 @@ export default function UserSidebar({ contentOnly = false }: UserSidebarProps) {
     const navigate = useNavigate();
     const location = useLocation();
     const params = useParams();
-    const { userInfo, API_URL } = useAuth();
+    const { userInfo } = useAuth();
     const isUser = userInfo?.role?.name === 'user';
     const isAdmin = userInfo?.role?.name === 'admin';
     const isMobile = useMediaQuery('(max-width: 768px)');
@@ -105,12 +105,12 @@ export default function UserSidebar({ contentOnly = false }: UserSidebarProps) {
     }, [location.pathname]);
 
     const fetchCourseData = useCallback(async () => {
-        if (!courseId || !API_URL) return;
+        if (!courseId) return;
 
         setLoadingCourse(true);
         try {
             // Fetch course
-            const courseData = await getCourse(Number(courseId), API_URL);
+            const courseData = await getCourse(Number(courseId));
             setCourse(courseData);
             // Module functionality will be implemented by students
         } catch (err) {
@@ -118,16 +118,16 @@ export default function UserSidebar({ contentOnly = false }: UserSidebarProps) {
         } finally {
             setLoadingCourse(false);
         }
-    }, [courseId, API_URL]);
+    }, [courseId]);
 
     // Fetch course data when on course pages
     useEffect(() => {
-        if (showCourseNav && courseId && API_URL) {
+        if (showCourseNav && courseId) {
             fetchCourseData();
         } else {
             setCourse(null);
         }
-    }, [showCourseNav, courseId, fetchCourseData, API_URL]);
+    }, [showCourseNav, courseId, fetchCourseData]);
 
     // NOW we can do early returns - all hooks have been called
     // Desktop: Show sidebar if user is a regular user OR if on preview route
