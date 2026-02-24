@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import TIMESTAMP, CheckConstraint, Column, ForeignKey, Integer
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import backref, relationship
 
 from .base import Base
 
@@ -13,7 +13,9 @@ class CompletedUserItem(Base):
     __tablename__ = "completed_user_items"
 
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    user_id = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
     course_id = Column(Integer, ForeignKey("courses.id", ondelete="CASCADE"))
     module_id = Column(Integer, ForeignKey("modules.id", ondelete="CASCADE"))
     post_id = Column(Integer, ForeignKey("posts.id", ondelete="CASCADE"))
@@ -23,11 +25,14 @@ class CompletedUserItem(Base):
     # Relationships
     user = relationship("User", backref="completed_user_items")
     course = relationship("Course", backref="completed_user_items")
-    module = relationship("Module", backref=backref(
-        "completed_user_items",
-        cascade="all, delete-orphan",
-        passive_deletes=True,
-    ),)
+    module = relationship(
+        "Module",
+        backref=backref(
+            "completed_user_items",
+            cascade="all, delete-orphan",
+            passive_deletes=True,
+        ),
+    )
     post = relationship("Post", backref="completed_user_items")
 
     # Constraints
