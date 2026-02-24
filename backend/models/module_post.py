@@ -24,7 +24,11 @@ class ModulePost(Base):
     updated_at = Column(TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relationships
-    post = relationship("Post", backref="module_posts")
+    post = relationship("Post", backref=backref(
+            "module_posts",
+            cascade="all, delete-orphan",
+            passive_deletes=True,
+        ),)
     module = relationship(
         "Module",
         backref=backref(
