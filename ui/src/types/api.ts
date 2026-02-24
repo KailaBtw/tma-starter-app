@@ -115,6 +115,7 @@ export interface ModuleDetail extends Module {
 export interface ModuleCreate {
     title: string;
     description?: string | null;
+    color?: string | null
 }
 
 export interface ModuleUpdate {
