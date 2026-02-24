@@ -25,5 +25,5 @@ class Course(Base):
 
     # Many-to-Many Joins
     users = association_proxy("course_users", "users")
-    modules = association_proxy("course_modules", "modules")
+    module = association_proxy("course_modules", "module")
     users_who_completed_course = association_proxy("completed_user_items", "users")

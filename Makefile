@@ -35,3 +35,15 @@ test-ui:
 
 
 
+# logs
+logs-backend:
+	$(MAKE) -C backend logs
+
+logs-frontend:
+	$(MAKE) -C ui logs
+
+# database
+logs-db:
+	$(MAKE) -C database logs
+
+

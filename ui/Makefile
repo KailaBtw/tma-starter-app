@@ -15,4 +15,5 @@ test:
 test-watch:
 	docker exec -it tma_frontend npm run test:watch
 
-	
+logs:
+	docker logs -f tma_frontend

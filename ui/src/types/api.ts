@@ -119,7 +119,7 @@ export interface ModuleCreate {
 
 export interface ModuleUpdate {
     title?: string | null;
-    descriptio?: string | null;
+    description?: string | null;
 }
 
 // ============================================================================
