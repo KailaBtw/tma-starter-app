@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import TIMESTAMP, Column, ForeignKey, Integer
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import backref, relationship
 
 from .base import Base
 
@@ -13,7 +13,9 @@ class CourseModule(Base):
 
     id = Column(Integer, primary_key=True)
     course_id = Column(Integer, ForeignKey("courses.id"), nullable=False)
-    module_id = Column(Integer, ForeignKey("modules.id"), nullable=False)
+    module_id = Column(
+        Integer, ForeignKey("modules.id", ondelete="CASCADE"), nullable=False
+    )
     ordering = Column(Integer, default=0)
 
     created_at = Column(TIMESTAMP, default=datetime.utcnow)
@@ -21,4 +23,11 @@ class CourseModule(Base):
 
     # Relationships
     course = relationship("Course", backref="course_modules")
-    module = relationship("Module", backref="course_modules")
+    module = relationship(
+        "Module",
+        backref=backref(
+            "course_modules",
+            cascade="all, delete-orphan",
+            passive_deletes=True,
+        ),
+    )

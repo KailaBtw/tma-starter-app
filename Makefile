@@ -1,5 +1,7 @@
-.PHONY: format
-
+.PHONY: check-backend fix-backend test-backend
+.PHONY: check-mobile fix-mobile test-mobile
+.PHONY: check-ui fix-ui test-ui
+.PHONY: logs-backend logs-frontend logs-db
 
 # backend
 check-backend:

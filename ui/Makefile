@@ -1,4 +1,4 @@
-.PHONY: format
+.PHONY: bash fix check test test-watch logs
 
 bash:
 	docker exec -it tma_frontend bash
