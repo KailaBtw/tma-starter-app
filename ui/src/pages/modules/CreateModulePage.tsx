@@ -3,13 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import {
     Stack,
     TextInput,
-    PasswordInput,
     Button,
     Alert,
     Paper,
     Title,
     Group,
-    Select,
     Divider,
     Grid,
 } from '@mantine/core';
@@ -44,7 +42,7 @@ export default function CreateModulePage() {
 
                 await createModule(moduleData);
                         // Navigate back to modules list
-                        navigate('/dashboard/modules');
+                        navigate('/dashboard/modules/');
                     } catch (err) {
                         const errorMessage =
                             err instanceof Error ? err.message : 'Unknown error';
@@ -134,7 +132,7 @@ export default function CreateModulePage() {
                                     <Group justify="flex-end" mt="xl">
                                         <Button
                                             variant="subtle"
-                                            onClick={() => navigate('/dashboard/modules')}
+                                            onClick={() => handleSubmit}
                                             disabled={saving}
                                         >
                                             Cancel
