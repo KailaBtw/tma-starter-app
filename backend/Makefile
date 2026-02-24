@@ -15,5 +15,6 @@ test:
 test-cov:
 	docker exec -it tma_backend poetry run pytest --cov
 
-
+logs:
+	docker logs -f tma_backend
 	
