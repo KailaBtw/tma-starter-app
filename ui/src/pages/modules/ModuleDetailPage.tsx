@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useDisclosure } from '@mantine/hooks';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -12,7 +12,6 @@ import ModuleDetailCard from '../../components/modules/ModuleDetailCard';
 
 export default function ModuleDetailPage() {
     const { moduleId } = useParams<{ moduleId: string }>();
-    const navigate = useNavigate();
     const { userInfo } = useAuth();
     const [editModalOpened, { open: openEditModal, close: closeEditModal }] =
         useDisclosure(false);
@@ -53,7 +52,9 @@ export default function ModuleDetailPage() {
         setError(null);
         try {
             await deleteModule(Number(moduleId));
-            navigate(-1);
+            // Redirect to list so the page refreshes and list refetches
+            window.location.replace('/dashboard/modules');
+            return;
         } catch (err) {
             setError(
                 err instanceof Error
