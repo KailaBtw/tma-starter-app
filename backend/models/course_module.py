@@ -12,7 +12,9 @@ class CourseModule(Base):
     __tablename__ = "course_modules"
 
     id = Column(Integer, primary_key=True)
-    course_id = Column(Integer, ForeignKey("courses.id"), nullable=False)
+    course_id = Column(
+        Integer, ForeignKey("courses.id", ondelete="CASCADE"), nullable=False
+    )
     module_id = Column(
         Integer, ForeignKey("modules.id", ondelete="CASCADE"), nullable=False
     )
@@ -22,7 +24,14 @@ class CourseModule(Base):
     updated_at = Column(TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relationships
-    course = relationship("Course", backref="course_modules")
+    course = relationship(
+        "Course",
+        backref=backref(
+            "course_modules",
+            cascade="all, delete-orphan",
+            passive_deletes=True,
+        ),
+    )
     module = relationship(
         "Module",
         backref=backref(

@@ -1,30 +1,60 @@
-import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { IconTrash } from '@tabler/icons-react';
-import { deleteModule } from '../../utils/api';
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { useDisclosure } from '@mantine/hooks';
+import { IconEdit, IconTrash } from '@tabler/icons-react';
+import { useAuth } from '../../contexts/AuthContext';
+import { getModule, patchModule, deleteModule } from '../../utils/api';
 import AdminPageLayout from '../../components/layout/AdminPageLayout';
+import EditModuleModal from '../../components/modules/EditModuleModal';
+import { usePageState } from '../../hooks/usePageState';
+import type { ModuleUpdate, ModuleDetail } from '../../types/api';
+import ModuleDetailCard from '../../components/modules/ModuleDetailCard';
 
 export default function ModuleDetailPage() {
     const { moduleId } = useParams<{ moduleId: string }>();
-    const navigate = useNavigate();
+    const { userInfo } = useAuth();
+    const [editModalOpened, { open: openEditModal, close: closeEditModal }] =
+        useDisclosure(false);
 
-    const [loading, setLoading] = useState(false);
+    // Form state for moduile edit
+    const [moduleTitle, setModuleTitle] = useState('');
+    const [moduleDescription, setModuleDescription] = useState('');
+    const [module, setModule] = useState<ModuleDetail | null>(null);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    // Check if user can edit (admin only)
+    const canEdit = userInfo?.role?.name === 'admin';
+
+    async function fetchModule() {
+        if (!moduleId) return;
+        setLoading(true);
+        setError(null);
+        try {
+            const moduleData = await getModule(Number(moduleId));
+            setModule(moduleData);
+        } catch (err) {
+            const errorMessage =
+                err instanceof Error ? err.message : 'Unknown error';
+            setError(errorMessage);
+        } finally {
+            setLoading(false);
+        }
+    }
 
     async function handleDeleteModule() {
         if (!moduleId) return;
-
-        //Confirming delete message
         const confirmation = window.confirm(
             'Are you sure you want to delete this module?'
         );
         if (!confirmation) return;
-
         setLoading(true);
         setError(null);
         try {
             await deleteModule(Number(moduleId));
-            navigate(-1);
+            // Redirect to list so the page refreshes and list refetches
+            window.location.replace('/dashboard/modules');
+            return;
         } catch (err) {
             setError(
                 err instanceof Error
@@ -36,30 +66,122 @@ export default function ModuleDetailPage() {
         }
     }
 
+    useEffect(() => {
+        if (moduleId) {
+            fetchModule();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [moduleId]);
+
+    // Initialize form state when module loads
+    useEffect(() => {
+        if (module) {
+            setModuleTitle(module.title);
+            setModuleDescription(module.description || '');
+        }
+    }, [module]);
+
+    function handleEditModule() {
+        if (module) {
+            setModuleTitle(module.title);
+            setModuleDescription(module.description || '');
+            openEditModal();
+        }
+    }
+
+    async function handleUpdateModule(e: React.FormEvent) {
+        e.preventDefault();
+        if (!moduleId) return;
+        setLoading(true);
+        setError(null);
+
+        try {
+            const updateData: ModuleUpdate = {
+                title: moduleTitle.trim(),
+                description: moduleDescription.trim() || null,
+            };
+
+            await patchModule(Number(moduleId), updateData);
+            closeEditModal();
+            await fetchModule();
+        } catch (err) {
+            const errorMessage =
+                err instanceof Error ? err.message : 'Unknown error';
+            setError(errorMessage);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const pageState = usePageState({
+        data: module,
+        loading,
+        error,
+        notFoundMessage: 'module Not Found',
+    });
+
+    if (!pageState.shouldRenderContent) {
+        return pageState.component;
+    }
+
+    if (!module) {
+        return null;
+    }
+
     const breadcrumbs = [
         { title: 'Dashboard', href: '/dashboard/modules' },
         { title: 'Modules', href: '/dashboard/modules' },
-        { title: 'Module Detail', href: '#' },
+        { title: module.title, href: '#' },
     ];
 
-    const menuItems = [
-        {
-            label: loading ? 'Deleting...' : 'Delete Module',
-            icon: <IconTrash size={16} />,
-            onClick: handleDeleteModule,
-            disabled: loading,
-        },
-    ];
+    // Prepare menu items for PageHeader (Edit and Delete for admin)
+    const menuItems = canEdit
+        ? [
+              {
+                  label: 'Edit Module',
+                  icon: <IconEdit size={16} />,
+                  onClick: handleEditModule,
+              },
+              {
+                  label: loading ? 'Deleting...' : 'Delete Module',
+                  icon: <IconTrash size={16} />,
+                  onClick: handleDeleteModule,
+                  disabled: loading,
+              },
+          ]
+        : undefined;
 
     return (
         <AdminPageLayout
             breadcrumbs={breadcrumbs}
-            title="Module Detail"
+            title={module.title}
+            description={module.description || undefined}
             menuItems={menuItems}
             content={
                 <>
-                    {error && <p style={{ color: 'red' }}>{error}</p>}
-                    <p>Module details will be implemented</p>
+                    <ModuleDetailCard
+                        description={module.description || undefined}
+                        title={module.title}
+                        canEdit={canEdit}
+                        onEdit={handleEditModule}
+                    />
+                    {/* Edit module Modal */}
+                    {canEdit && (
+                        <EditModuleModal
+                            opened={editModalOpened}
+                            onClose={closeEditModal}
+                            moduleTitle={moduleTitle}
+                            moduleDescription={moduleDescription}
+                            onTitleChange={(
+                                e: React.ChangeEvent<HTMLInputElement>
+                            ) => setModuleTitle(e.currentTarget.value)}
+                            onDescriptionChange={(
+                                e: React.ChangeEvent<HTMLTextAreaElement>
+                            ) => setModuleDescription(e.currentTarget.value)}
+                            onSubmit={handleUpdateModule}
+                            loading={loading}
+                        />
+                    )}
                 </>
             }
         />

@@ -23,8 +23,22 @@ class CompletedUserItem(Base):
     completed_at = Column(TIMESTAMP, default=datetime.utcnow)
 
     # Relationships
-    user = relationship("User", backref="completed_user_items")
-    course = relationship("Course", backref="completed_user_items")
+    user = relationship(
+        "User",
+        backref=backref(
+            "completed_user_items",
+            cascade="all, delete-orphan",
+            passive_deletes=True,
+        ),
+    )
+    course = relationship(
+        "Course",
+        backref=backref(
+            "completed_user_items",
+            cascade="all, delete-orphan",
+            passive_deletes=True,
+        ),
+    )
     module = relationship(
         "Module",
         backref=backref(
@@ -33,7 +47,14 @@ class CompletedUserItem(Base):
             passive_deletes=True,
         ),
     )
-    post = relationship("Post", backref="completed_user_items")
+    post = relationship(
+        "Post",
+        backref=backref(
+            "completed_user_items",
+            cascade="all, delete-orphan",
+            passive_deletes=True,
+        ),
+    )
 
     # Constraints
     __table_args__ = (
