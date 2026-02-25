@@ -42,7 +42,7 @@ export default function CreateModulePage() {
 
                 await createModule(moduleData);
                         // Navigate back to modules list
-                        navigate('/dashboard/modules/');
+                        navigate('/dashboard/courses/');
                     } catch (err) {
                         const errorMessage =
                             err instanceof Error ? err.message : 'Unknown error';
@@ -132,6 +132,7 @@ export default function CreateModulePage() {
                                     <Group justify="flex-end" mt="xl">
                                         <Button
                                             variant="subtle"
+                                            onClick={() => navigate('/dashboard/courses/')}
                                             disabled={saving}
                                         >
                                             Cancel
