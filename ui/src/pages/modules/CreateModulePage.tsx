@@ -93,7 +93,7 @@ export default function CreateModulePage() {
         
                                     <Divider />
         
-                                    {/* Profile Fields Section */}
+                                    {/* Optional Fields Section */}
                                     <Stack gap="md">
                                         <Title order={3}>
                                             Additional Information (Optional)
@@ -132,12 +132,15 @@ export default function CreateModulePage() {
                                     <Group justify="flex-end" mt="xl">
                                         <Button
                                             variant="subtle"
-                                            onClick={() => handleSubmit}
                                             disabled={saving}
                                         >
                                             Cancel
                                         </Button>
-                                        <Button type="submit" loading={saving}>
+                                        <Button 
+                                            type="submit" 
+                                            onClick={() => handleSubmit}
+                                            loading={saving}
+                                            >
                                             Create Module
                                         </Button>
                                     </Group>
