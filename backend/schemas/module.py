@@ -31,7 +31,6 @@ class ModuleUpdate(BaseModel):
     color: Optional[str] = None
 
 
-
 class ModuleResponse(ModuleBase):
     """Schema for module response"""
 
@@ -40,7 +39,7 @@ class ModuleResponse(ModuleBase):
     id: int
     created_at: datetime
     updated_at: datetime
-    color: str
+    
     # When the Post schema is implemented, can
     # make this smarter.
     post_count: int = 0

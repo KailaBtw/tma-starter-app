@@ -154,9 +154,7 @@ async def create_module(
             description=(
                 module_data.description.strip() if module_data.description else None
             ),
-            color=(
-                module_data.color.strip() if module_data.color else None
-            ),
+            color=(module_data.color.strip() if module_data.color else None),
         )
         db.add(module)
         await db.commit()
@@ -210,9 +208,7 @@ async def update_module(
             module_data.description.strip() if module_data.description else None
         )
     if module_data.color is not None:
-        module.color = (
-            module_data.color.strip() if module_data.description else None
-        )
+        module.color = module_data.color.strip() if module_data.description else None
 
     # File upload functionality will be implemented by students
 
