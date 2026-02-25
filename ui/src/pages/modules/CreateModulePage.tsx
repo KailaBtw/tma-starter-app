@@ -96,7 +96,7 @@ export default function CreateModulePage() {
                                     {/* Profile Fields Section */}
                                     <Stack gap="md">
                                         <Title order={3}>
-                                            Profile Information (Optional)
+                                            Additional Information (Optional)
                                         </Title>
                                         <Grid>
                                             <Grid.Col span={{ base: 12, sm: 6 }}>
