@@ -39,7 +39,7 @@ class ModuleResponse(ModuleBase):
     id: int
     created_at: datetime
     updated_at: datetime
-    
+
     # When the Post schema is implemented, can
     # make this smarter.
     post_count: int = 0
