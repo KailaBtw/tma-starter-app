@@ -1,5 +1,7 @@
-.PHONY: format
-
+.PHONY: check-backend fix-backend test-backend
+.PHONY: check-mobile fix-mobile test-mobile
+.PHONY: check-ui fix-ui test-ui
+.PHONY: logs-backend logs-frontend logs-db
 
 # backend
 check-backend:
@@ -33,5 +35,17 @@ fix-ui:
 test-ui:
 	$(MAKE) -C ui test
 
+
+
+# logs
+logs-backend:
+	$(MAKE) -C backend logs
+
+logs-frontend:
+	$(MAKE) -C ui logs
+
+# database
+logs-db:
+	$(MAKE) -C database logs
 
 

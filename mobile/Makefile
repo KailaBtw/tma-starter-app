@@ -1,4 +1,4 @@
-.PHONY: format
+.PHONY: start fix check test test-watch
 
 start:
 	npx expo start

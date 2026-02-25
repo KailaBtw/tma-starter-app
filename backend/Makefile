@@ -1,4 +1,4 @@
-.PHONY: format
+.PHONY: bash fix check test test-cov logs
 
 bash:
 	docker exec -it tma_backend bash
@@ -15,5 +15,6 @@ test:
 test-cov:
 	docker exec -it tma_backend poetry run pytest --cov
 
-
+logs:
+	docker logs -f tma_backend
 	

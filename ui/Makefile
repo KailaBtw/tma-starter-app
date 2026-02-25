@@ -1,4 +1,4 @@
-.PHONY: format
+.PHONY: bash fix check test test-watch logs
 
 bash:
 	docker exec -it tma_frontend bash
@@ -15,4 +15,5 @@ test:
 test-watch:
 	docker exec -it tma_frontend npm run test:watch
 
-	
+logs:
+	docker logs -f tma_frontend
