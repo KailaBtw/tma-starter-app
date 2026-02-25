@@ -84,7 +84,7 @@ export interface Course {
 }
 
 export interface CourseDetail extends Course {
-    // Note: Modules will be added by students
+    modules: Module[];
 }
 
 export interface CourseCreate {

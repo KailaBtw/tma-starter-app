@@ -90,15 +90,12 @@ async def get_course(
     db: AsyncSession = Depends(get_db),
 ):
     """
-    Get a single course by ID. Modules will be implemented by students.
+    Get a single course by ID and its modules.
     """
     result = await db.execute(
         select(Course)
-        # Ordering
-        .outerjoin(CourseModule, CourseModule.course_id == Course.id)
         .where(Course.id == course_id)
         .options(joinedload(Course.course_modules).joinedload(CourseModule.module))
-        .order_by(CourseModule.ordering)
     )
     course = result.unique().scalar_one_or_none()
 
@@ -107,15 +104,19 @@ async def get_course(
             status_code=status.HTTP_404_NOT_FOUND, detail="Course not found"
         )
 
-    return course
-    # {
-    #     "id": course.id,
-    #     "title": course.title,
-    #     "description": course.description,
-    #     "created_at": course.created_at,
-    #     "updated_at": course.updated_at,
-    #     "modules": [],  # Modules will be implemented by students
-    # }
+    # Retrieve modules and sort by ordering defined in course_modules
+    sorted_course_modules = sorted(course.course_modules, key=lambda cm: cm.ordering)
+    modules = [cm.module for cm in sorted_course_modules]
+
+    # Create response with modules
+    return {
+        "id": course.id,
+        "title": course.title,
+        "description": course.description,
+        "created_at": course.created_at,
+        "updated_at": course.updated_at,
+        "modules": modules,
+    }
 
 
 @router.post(

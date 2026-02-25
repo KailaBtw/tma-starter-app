@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useDisclosure } from '@mantine/hooks';
-import { IconEdit } from '@tabler/icons-react';
+import { Card, SimpleGrid, Stack, Box, Text } from '@mantine/core';
+import { IconEdit, IconPlus, IconBook } from '@tabler/icons-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { getCourse, patchCourse } from '../../utils/api';
 import AdminPageLayout from '../../components/layout/AdminPageLayout';
@@ -14,6 +15,8 @@ export default function CourseDetailPage() {
     const { userInfo } = useAuth();
     const [editModalOpened, { open: openEditModal, close: closeEditModal }] =
         useDisclosure(false);
+
+    const navigate = useNavigate();
 
     // Form state for course edit
     const [courseTitle, setCourseTitle] = useState('');
@@ -64,6 +67,10 @@ export default function CourseDetailPage() {
         }
     }
 
+    function handleCreateModule() {
+        navigate('/dashboard/modules/new');
+    }
+
     async function handleUpdateCourse(e: React.FormEvent) {
         e.preventDefault();
         if (!courseId) return;
@@ -88,6 +95,17 @@ export default function CourseDetailPage() {
         }
     }
 
+    const breadcrumbs = course
+        ? [
+              { title: 'Dashboard', href: '/dashboard/courses' },
+              { title: 'Courses', href: '/dashboard/courses' },
+              { title: course.title, href: '#' },
+          ]
+        : [
+              { title: 'Dashboard', href: '/dashboard/courses' },
+              { title: 'Courses', href: '/dashboard/courses' },
+          ];
+
     const pageState = usePageState({
         data: course,
         loading,
@@ -103,12 +121,6 @@ export default function CourseDetailPage() {
         return null;
     }
 
-    const breadcrumbs = [
-        { title: 'Dashboard', href: '/dashboard/courses' },
-        { title: 'Courses', href: '/dashboard/courses' },
-        { title: course.title, href: '#' },
-    ];
-
     // Prepare menu items for PageHeader
     const menuItems = canEdit
         ? [
@@ -116,6 +128,11 @@ export default function CourseDetailPage() {
                   label: 'Edit Course',
                   icon: <IconEdit size={16} />,
                   onClick: handleEditCourse,
+              },
+              {
+                  label: 'Create Module',
+                  icon: <IconPlus size={16} />,
+                  onClick: handleCreateModule,
               },
           ]
         : undefined;
@@ -128,13 +145,120 @@ export default function CourseDetailPage() {
             menuItems={menuItems}
             content={
                 <>
-                    <div>
-                        <p>
-                            Modules functionality will be implemented by
-                            students.
-                        </p>
-                        <p>This course currently has no modules.</p>
-                    </div>
+                    <Box
+                        style={{
+                            backgroundColor: 'var(--mantine-color-gray-2)',
+                            borderRadius: '12px',
+                            padding: '24px',
+                            marginBottom: '24px',
+                        }}
+                    >
+                        <Text fw={700} size="lg" mb="lg">
+                            Modules
+                        </Text>
+                        {course.modules && course.modules.length > 0 ? (
+                            <SimpleGrid
+                                cols={{ base: 1, xs: 2, sm: 2, md: 2, lg: 3 }}
+                                spacing="md"
+                            >
+                                {course.modules.map((module) => (
+                                    <Card
+                                        key={module.id}
+                                        shadow="sm"
+                                        padding="lg"
+                                        radius="md"
+                                        withBorder
+                                        onClick={() =>
+                                            navigate(
+                                                `/dashboard/modules/${module.id}`
+                                            )
+                                        }
+                                        style={{
+                                            cursor: 'pointer',
+                                            transition:
+                                                'transform 0.2s, box-shadow 0.2s',
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.transform =
+                                                'translateY(-2px)';
+                                            e.currentTarget.style.boxShadow =
+                                                'var(--mantine-shadow-md)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.transform =
+                                                'translateY(0)';
+                                            e.currentTarget.style.boxShadow =
+                                                'var(--mantine-shadow-sm)';
+                                        }}
+                                    >
+                                        <Stack gap="md">
+                                            {/* Title and Picture */}
+                                            <Box
+                                                style={{
+                                                    display: 'flex',
+                                                    alignItems: 'flex-start',
+                                                    gap: '12px',
+                                                }}
+                                            >
+                                                <Box
+                                                    style={{
+                                                        padding: '12px',
+                                                        borderRadius: '8px',
+                                                        backgroundColor:
+                                                            'var(--mantine-color-blue-0)',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent:
+                                                            'center',
+                                                    }}
+                                                >
+                                                    <IconBook
+                                                        size={24}
+                                                        style={{
+                                                            color: 'var(--mantine-color-blue-6)',
+                                                        }}
+                                                    />
+                                                </Box>
+                                                <div
+                                                    style={{
+                                                        flex: 1,
+                                                        minWidth: 0,
+                                                    }}
+                                                >
+                                                    <Text
+                                                        fw={600}
+                                                        size="lg"
+                                                        lineClamp={2}
+                                                        style={{
+                                                            marginBottom: '4px',
+                                                        }}
+                                                    >
+                                                        {module.title}
+                                                    </Text>
+                                                </div>
+                                            </Box>
+
+                                            {/* Description */}
+                                            {module.description && (
+                                                <Text
+                                                    size="sm"
+                                                    lineClamp={3}
+                                                    c="dimmed"
+                                                    style={{
+                                                        minHeight: '60px',
+                                                    }}
+                                                >
+                                                    {module.description}
+                                                </Text>
+                                            )}
+                                        </Stack>
+                                    </Card>
+                                ))}
+                            </SimpleGrid>
+                        ) : (
+                            <Text>This course has no modules.</Text>
+                        )}
+                    </Box>
 
                     {/* Edit Course Modal */}
                     {canEdit && (
