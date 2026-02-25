@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useDisclosure } from '@mantine/hooks';
-import { IconEdit } from '@tabler/icons-react';
+import { IconEdit, IconTrash } from '@tabler/icons-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { getModule, patchModule } from '../../utils/api';
+import { getModule, patchModule, deleteModule } from '../../utils/api';
 import AdminPageLayout from '../../components/layout/AdminPageLayout';
 import EditModuleModal from '../../components/modules/EditModuleModal';
 import { usePageState } from '../../hooks/usePageState';
@@ -12,6 +12,7 @@ import ModuleDetailCard from '../../components/modules/ModuleDetailCard';
 
 export default function ModuleDetailPage() {
     const { moduleId } = useParams<{ moduleId: string }>();
+    const navigate = useNavigate();
     const { userInfo } = useAuth();
     const [editModalOpened, { open: openEditModal, close: closeEditModal }] =
         useDisclosure(false);
@@ -37,6 +38,28 @@ export default function ModuleDetailPage() {
             const errorMessage =
                 err instanceof Error ? err.message : 'Unknown error';
             setError(errorMessage);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    async function handleDeleteModule() {
+        if (!moduleId) return;
+        const confirmation = window.confirm(
+            'Are you sure you want to delete this module?'
+        );
+        if (!confirmation) return;
+        setLoading(true);
+        setError(null);
+        try {
+            await deleteModule(Number(moduleId));
+            navigate(-1);
+        } catch (err) {
+            setError(
+                err instanceof Error
+                    ? err.message
+                    : 'Failed to delete the Module.'
+            );
         } finally {
             setLoading(false);
         }
@@ -110,13 +133,19 @@ export default function ModuleDetailPage() {
         { title: module.title, href: '#' },
     ];
 
-    // Prepare menu items for PageHeader
+    // Prepare menu items for PageHeader (Edit and Delete for admin)
     const menuItems = canEdit
         ? [
               {
                   label: 'Edit Module',
                   icon: <IconEdit size={16} />,
                   onClick: handleEditModule,
+              },
+              {
+                  label: loading ? 'Deleting...' : 'Delete Module',
+                  icon: <IconTrash size={16} />,
+                  onClick: handleDeleteModule,
+                  disabled: loading,
               },
           ]
         : undefined;
