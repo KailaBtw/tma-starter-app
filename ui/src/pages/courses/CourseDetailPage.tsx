@@ -111,10 +111,6 @@ export default function CourseDetailPage() {
         loading,
         error,
         notFoundMessage: 'Course Not Found',
-        layoutComponent: AdminPageLayout,
-        layoutProps: {
-            breadcrumbs
-        },
     });
 
     if (!pageState.shouldRenderContent) {
@@ -137,7 +133,7 @@ export default function CourseDetailPage() {
                   label: 'Create Module',
                   icon: <IconPlus size={16} />,
                   onClick: handleCreateModule,
-              }
+              },
           ]
         : undefined;
 
@@ -161,84 +157,107 @@ export default function CourseDetailPage() {
                             Modules
                         </Text>
                         {course.modules && course.modules.length > 0 ? (
-                            <SimpleGrid cols={{ base: 1, xs: 2, sm: 2, md: 2, lg: 3 }} spacing="md">
+                            <SimpleGrid
+                                cols={{ base: 1, xs: 2, sm: 2, md: 2, lg: 3 }}
+                                spacing="md"
+                            >
                                 {course.modules.map((module) => (
-                                <Card
-                                    key={module.id}
-                                    shadow="sm"
-                                    padding="lg"
-                                    radius="md"
-                                    withBorder
-                                    onClick={() => navigate(`/dashboard/modules/${module.id}`)}
-                                    style={{
-                                        cursor: 'pointer',
-                                        transition: 'transform 0.2s, box-shadow 0.2s',
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.transform = 'translateY(-2px)';
-                                        e.currentTarget.style.boxShadow = 'var(--mantine-shadow-md)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.transform = 'translateY(0)';
-                                        e.currentTarget.style.boxShadow = 'var(--mantine-shadow-sm)';
-                                    }}
-                                >
-                                    <Stack gap="md">
-                                        {/* Title and Picture */}
-                                        <Box
-                                            style={{
-                                                display: 'flex',
-                                                alignItems: 'flex-start',
-                                                gap: '12px',
-                                            }}
-                                        >
+                                    <Card
+                                        key={module.id}
+                                        shadow="sm"
+                                        padding="lg"
+                                        radius="md"
+                                        withBorder
+                                        onClick={() =>
+                                            navigate(
+                                                `/dashboard/modules/${module.id}`
+                                            )
+                                        }
+                                        style={{
+                                            cursor: 'pointer',
+                                            transition:
+                                                'transform 0.2s, box-shadow 0.2s',
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.transform =
+                                                'translateY(-2px)';
+                                            e.currentTarget.style.boxShadow =
+                                                'var(--mantine-shadow-md)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.transform =
+                                                'translateY(0)';
+                                            e.currentTarget.style.boxShadow =
+                                                'var(--mantine-shadow-sm)';
+                                        }}
+                                    >
+                                        <Stack gap="md">
+                                            {/* Title and Picture */}
                                             <Box
                                                 style={{
-                                                    padding: '12px',
-                                                    borderRadius: '8px',
-                                                    backgroundColor: 'var(--mantine-color-blue-0)',
                                                     display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
+                                                    alignItems: 'flex-start',
+                                                    gap: '12px',
                                                 }}
                                             >
-                                                <IconBook
-                                                    size={24}
+                                                <Box
                                                     style={{
-                                                        color: 'var(--mantine-color-blue-6)',
+                                                        padding: '12px',
+                                                        borderRadius: '8px',
+                                                        backgroundColor:
+                                                            'var(--mantine-color-blue-0)',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent:
+                                                            'center',
                                                     }}
-                                                />
-                                            </Box>
-                                            <div style={{ flex: 1, minWidth: 0 }}>
-                                                <Text
-                                                    fw={600}
-                                                    size="lg"
-                                                    lineClamp={2}
-                                                    style={{ marginBottom: '4px' }}
                                                 >
-                                                    {module.title}
-                                                </Text>
-                                            </div>
-                                        </Box>
+                                                    <IconBook
+                                                        size={24}
+                                                        style={{
+                                                            color: 'var(--mantine-color-blue-6)',
+                                                        }}
+                                                    />
+                                                </Box>
+                                                <div
+                                                    style={{
+                                                        flex: 1,
+                                                        minWidth: 0,
+                                                    }}
+                                                >
+                                                    <Text
+                                                        fw={600}
+                                                        size="lg"
+                                                        lineClamp={2}
+                                                        style={{
+                                                            marginBottom: '4px',
+                                                        }}
+                                                    >
+                                                        {module.title}
+                                                    </Text>
+                                                </div>
+                                            </Box>
 
-                                        {/* Description */}
-                                        {module.description && (
-                                            <Text
-                                                size="sm"
-                                                lineClamp={3}
-                                                c="dimmed"
-                                                style={{ minHeight: '60px' }}
-                                            >
-                                                {module.description}
-                                            </Text>
-                                        )}
-                                    </Stack>
-                                </Card>
-                            ))}
-                        </SimpleGrid>
-                    ) : (
-                        <Text>This course has no modules.</Text>
-                    )}
+                                            {/* Description */}
+                                            {module.description && (
+                                                <Text
+                                                    size="sm"
+                                                    lineClamp={3}
+                                                    c="dimmed"
+                                                    style={{
+                                                        minHeight: '60px',
+                                                    }}
+                                                >
+                                                    {module.description}
+                                                </Text>
+                                            )}
+                                        </Stack>
+                                    </Card>
+                                ))}
+                            </SimpleGrid>
+                        ) : (
+                            <Text>This course has no modules.</Text>
+                        )}
                     </Box>
 
                     {/* Edit Course Modal */}
