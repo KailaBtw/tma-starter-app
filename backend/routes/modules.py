@@ -155,6 +155,7 @@ async def create_module(
                 module_data.description.strip() if module_data.description else None
             ),
             color=(module_data.color.strip() if module_data.color else None),
+            # course_id=module_data.course_id, //How do I pass in course_id???
         )
         db.add(module)
         await db.commit()
