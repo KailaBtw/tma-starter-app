@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+
 import {
     Stack,
     TextInput,
@@ -19,6 +20,7 @@ export default function CreateModulePage() {
     const navigate = useNavigate();
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const location = useLocation();
 
     // Form state - required fields
     const [title, setTitle] = useState('');
@@ -37,11 +39,12 @@ export default function CreateModulePage() {
                 title: title.trim(),
                 description: description.trim() || null,
                 color: color.trim() || null,
+                course_id: location.state.course_id,
             };
 
             await createModule(moduleData);
             // Navigate back to courses list
-            navigate('/dashboard/courses/');
+            navigate(`/dashboard/courses/${location.state.course_id}`);
         } catch (err) {
             const errorMessage =
                 err instanceof Error ? err.message : 'Unknown error';
@@ -129,7 +132,7 @@ export default function CreateModulePage() {
                                 <Button
                                     variant="subtle"
                                     onClick={() =>
-                                        navigate('/dashboard/courses/')
+                                        navigate(`/dashboard/courses/${location.state.course_id}`)
                                     }
                                     disabled={saving}
                                 >

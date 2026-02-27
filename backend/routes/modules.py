@@ -155,11 +155,16 @@ async def create_module(
                 module_data.description.strip() if module_data.description else None
             ),
             color=(module_data.color.strip() if module_data.color else None),
-            # course_id=module_data.course_id, //How do I pass in course_id???
+            # course_id=module_data.course_id, 
         )
         db.add(module)
         await db.commit()
         await db.refresh(module)
+
+        course_module = CourseModule(course_id = module_data.course_id, module_id = module.id)
+        db.add(course_module)
+        await db.commit()
+        await db.refresh(course_module)
 
         return {
             "id": module.id,
@@ -169,6 +174,7 @@ async def create_module(
             "created_at": module.created_at,
             "updated_at": module.updated_at,
             "post_count": 0,  # Posts will be implemented by students
+            "course_id": module_data.course_id,
         }
     except Exception as e:
         await db.rollback()

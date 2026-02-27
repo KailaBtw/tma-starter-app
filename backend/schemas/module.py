@@ -17,8 +17,8 @@ class ModuleBase(BaseModel):
 
 class ModuleCreate(ModuleBase):
     """Schema for creating a new module"""
-
-    pass
+    course_id: int
+    
 
 
 class ModuleUpdate(BaseModel):
