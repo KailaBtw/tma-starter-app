@@ -117,7 +117,7 @@ export interface ModuleCreate {
     title: string;
     description?: string | null;
     color?: string | null;
-    course_id: Number;
+    course_id?: number | null;
 }
 
 export interface ModuleUpdate {

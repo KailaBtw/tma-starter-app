@@ -21,7 +21,7 @@ async def create_module(
     db: AsyncSession,
     title: str,
     description: str,
-    color:str,
+    color: str,
 ) -> Module:
     module = Module(title=title, description=description, color=color)
     db.add(module)

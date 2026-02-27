@@ -132,7 +132,9 @@ export default function CreateModulePage() {
                                 <Button
                                     variant="subtle"
                                     onClick={() =>
-                                        navigate(`/dashboard/courses/${location.state.course_id}`)
+                                        navigate(
+                                            `/dashboard/courses/${location.state.course_id}`
+                                        )
                                     }
                                     disabled={saving}
                                 >
