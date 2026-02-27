@@ -160,15 +160,13 @@ async def create_module(
         await db.commit()
         await db.refresh(module)
 
-        if (module_data.course_id): 
+        if module_data.course_id:
             course_module = CourseModule(
-            course_id=module_data.course_id, module_id=module.id 
+                course_id=module_data.course_id, module_id=module.id
             )
             db.add(course_module)
             await db.commit()
             await db.refresh(course_module)
-        
-   
 
         return {
             "id": module.id,
