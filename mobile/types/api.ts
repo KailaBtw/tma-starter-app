@@ -134,4 +134,53 @@ export interface CourseGroup {
     date_assigned: string;
 }
 
-// Module, Post, Quiz, and Progress types removed - these will be implemented by students
+// ============================================================================
+// Post Types
+// ============================================================================
+interface PostBase {
+    id: number;
+    title: string;
+    type: 'generic' | 'attachment' | 'video' | 'quiz';
+    text: string;
+}
+
+export interface PostAttachmentType extends PostBase {
+    pdfUrl: string;
+    fileName: string;
+    fileSize: number;
+}
+
+export interface PostGeneric extends PostBase {
+    image?: string;
+}
+
+export interface PostVideo extends PostBase {
+    vimeoId: string;
+}
+
+export interface PostQuiz extends PostBase {
+    questions: (
+        | MultipleChoiceQuestion
+        | TrueFalseQuestion
+        | SelectAllQuestion
+    )[];
+}
+
+interface QuestionBase {
+    question: string;
+    type: string;
+}
+
+export interface MultipleChoiceQuestion extends QuestionBase {
+    options: string[];
+    validAnswers: number[];
+}
+
+export interface TrueFalseQuestion extends QuestionBase {
+    validAnswers: boolean[];
+}
+
+export interface SelectAllQuestion extends QuestionBase {
+    options: string[];
+    validAnswers: number[];
+}
