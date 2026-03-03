@@ -1,37 +1,51 @@
-import { View, StyleSheet, ScrollView, Pressable } from 'react-native';
+import {
+    View,
+    StyleSheet,
+    ScrollView,
+    Linking,
+    useWindowDimensions,
+} from 'react-native';
 import { PostAttachmentType } from '../../types';
 import theme, { designTokens } from '../../theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Appbar, Card, Text } from 'react-native-paper';
+import { Appbar, Card, Text, Button } from 'react-native-paper';
+import { useState } from 'react';
+import generateReadableFileSize from '../../utils/generateReadableFileSize';
 
 interface props {
     postInfo: PostAttachmentType;
 }
 export default function PostAttachment({ postInfo }: props) {
+    const { width } = useWindowDimensions();
+    const [isDownloading, setIsDownloading] = useState<boolean>(false);
+    // ^ Later used to disable download button while downloading
+
     function handleDownload() {
         console.log('Eventually handle download');
+
+        // Dummy code showing that download button can disable during download
+        setIsDownloading(true);
+        setTimeout(() => {
+            setIsDownloading(false);
+        }, 2000);
     }
 
-    // TODO: Add imagined behavior for download button
-    // Ex. disabled during download, on press color change behavior?
+    const openWebsite = () => {
+        Linking.openURL(postInfo.pdfUrl);
+    };
 
-    function generateReadableFileSize() {
-        // File sizes are in bytes originally, ex. 1024000
-        const fileSizeBites = postInfo.fileSize;
+    // Used to change the layout a bit on larger screens
+    const responsiveStyle = StyleSheet.create({
+        flexContainer: {
+            flex: 1,
+            flexDirection: width > 600 ? 'row' : 'column',
+            justifyContent: 'space-between',
+        },
 
-        // bytes to kilobytes
-        const fileSizeKB: number = fileSizeBites / 1000;
-
-        const fileSizeMB: number = fileSizeKB / 1000;
-        if (fileSizeMB < 1) return fileSizeKB.toFixed(3) + ' KB';
-
-        const fileSizeGB: number = fileSizeMB / 1000;
-        if (fileSizeGB < 1) return fileSizeMB.toFixed(3) + ' MB';
-
-        const fileSizeTB: number = fileSizeGB / 1000;
-        if (fileSizeTB < 1) return fileSizeGB.toFixed(3) + ' GB';
-        return fileSizeTB.toFixed(3) + ' TB';
-    }
+        cardWidth: {
+            width: width > 600 ? '47%' : 'auto',
+        },
+    });
 
     return (
         <View
@@ -52,8 +66,23 @@ export default function PostAttachment({ postInfo }: props) {
                 contentContainerStyle={styles.scrollContent}
             >
                 <Text style={styles.postText}>{postInfo.text}</Text>
-                <Card style={styles.emptyCard} mode="elevated">
-                    <Pressable onPress={handleDownload}>
+                <View style={responsiveStyle.flexContainer}>
+                    <Button
+                        icon="link-variant"
+                        mode="elevated"
+                        onPress={openWebsite}
+                        style={[styles.emptyCard, responsiveStyle.cardWidth]}
+                    >
+                        {postInfo.pdfUrl}
+                    </Button>
+
+                    {/* <Card style={styles.emptyCard} mode="elevated"> */}
+                    <Button
+                        mode="elevated"
+                        onPress={handleDownload}
+                        disabled={isDownloading}
+                        style={[styles.emptyCard, responsiveStyle.cardWidth]}
+                    >
                         <Card.Content style={styles.emptyContent}>
                             <MaterialCommunityIcons
                                 name="download"
@@ -73,13 +102,15 @@ export default function PostAttachment({ postInfo }: props) {
                                     style={styles.emptyText}
                                 >
                                     {postInfo.fileName}
-                                    {'\t'}
-                                    {generateReadableFileSize()}
+                                    {'\t\t'}
+                                    {generateReadableFileSize(
+                                        postInfo.fileSize
+                                    )}
                                 </Text>
                             </View>
                         </Card.Content>
-                    </Pressable>
-                </Card>
+                    </Button>
+                </View>
             </ScrollView>
         </View>
     );
@@ -93,7 +124,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     scrollContent: {
-        padding: designTokens.spacing.xl,
+        padding: designTokens.spacing.md,
         paddingBottom: designTokens.spacing.xxxl,
     },
     headerTitle: {
@@ -108,8 +139,9 @@ const styles = StyleSheet.create({
         padding: designTokens.spacing.xxxl,
         flex: 1,
         flexDirection: 'row',
-        justifyContent: 'center',
-        gap: 24, // alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 24,
+        alignItems: 'center',
     },
     emptyIcon: {
         // marginBottom: designTokens.spacing.lg,
@@ -118,10 +150,12 @@ const styles = StyleSheet.create({
     emptyTitle: {
         marginBottom: designTokens.spacing.sm,
         fontWeight: '600',
+        // textAlign: 'center',
     },
     emptyText: {
         textAlign: 'left',
         opacity: 0.7,
+        // textAlign: 'center',
     },
     cardTextContent: {
         flex: 1,

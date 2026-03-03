@@ -3,14 +3,9 @@ import { Card, Text, Appbar, useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import ProtectedRoute from '../../components/ProtectedRoute';
 import { designTokens } from '../../theme';
-import PostAttachment from '../../components/posts/PostAttachment';
-import { dummyPosts } from '../../utils/dummyPost';
-import { PostAttachmentType } from '../../types';
 
 export default function ProgressScreen() {
     const theme = useTheme();
-    const attachmentPostData: PostAttachmentType =
-        dummyPosts[1] as PostAttachmentType;
 
     return (
         <ProtectedRoute>
@@ -51,7 +46,6 @@ export default function ProgressScreen() {
                         </Card.Content>
                     </Card>
                 </ScrollView>
-                <PostAttachment postInfo={attachmentPostData} />
             </View>
         </ProtectedRoute>
     );
