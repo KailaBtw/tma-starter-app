@@ -1,5 +1,11 @@
 module_title,post_title,ordering
-TestModuleAlpha,TestPostUno,1
-TestModuleAlpha,TestPostDos,2
-TestModuleBeta,TestPostUno,2
-TestModuleBeta,TestPostDos,1
+TestModule1,TestPostUno,1
+TestModule1,TestPostDos,2
+TestModule2,TestPostUno,1
+TestModule2,TestPostDos,2
+TestModule3,TestPostUno,1
+TestModule3,TestPostDos,2
+TestModule4,TestPostUno,1
+TestModule4,TestPostDos,2
+TestModule5,TestPostUno,1
+TestModule5,TestPostDos,2
