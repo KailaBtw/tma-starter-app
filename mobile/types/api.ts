@@ -67,10 +67,10 @@ export interface Course {
 }
 
 export interface Module {
-    module_id: number;
-    module_title: string;
-    module_description?: string | null;
-    module_color?: string | null;
+    id: number;
+    title: string;
+    description?: string | null;
+    color?: string | null;
     ordering: number;
     course_id: number;
     created_at: string;

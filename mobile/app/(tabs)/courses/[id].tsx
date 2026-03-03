@@ -110,12 +110,12 @@ export default function CourseDetailScreen() {
                                         )
                                         .map((module: Module) => (
                                             <Card
-                                                key={module.module_id}
+                                                key={module.id}
                                                 style={styles.card}
                                                 mode="elevated"
                                                 onPress={() =>
                                                     router.push(
-                                                        `/(tabs)/modules/${module.module_id}`
+                                                        `/(tabs)/modules/${module.id}`
                                                     )
                                                 }
                                             >
@@ -140,13 +140,13 @@ export default function CourseDetailScreen() {
                                                                 flex: 1,
                                                             }}
                                                         >
-                                                            {module.module_color && (
+                                                            {module.color && (
                                                                 <View
                                                                     style={[
                                                                         styles.colorIndicator,
                                                                         {
                                                                             backgroundColor:
-                                                                                module.module_color,
+                                                                                module.color,
                                                                         },
                                                                     ]}
                                                                 />
@@ -160,12 +160,12 @@ export default function CourseDetailScreen() {
                                                                 }}
                                                             >
                                                                 {
-                                                                    module.module_title
+                                                                    module.title || 'Module'
                                                                 }
                                                             </Text>
                                                         </View>
                                                     </View>
-                                                    {module.module_description && (
+                                                    {module.description && (
                                                         <Text
                                                             variant="bodyMedium"
                                                             style={
@@ -174,7 +174,7 @@ export default function CourseDetailScreen() {
                                                             numberOfLines={2}
                                                         >
                                                             {
-                                                                module.module_description
+                                                                module.description
                                                             }
                                                         </Text>
                                                     )}
