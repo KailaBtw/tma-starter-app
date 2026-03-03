@@ -1,0 +1,13 @@
+# For Android emulator with Docker on macOS or with the Expo emulator on your 
+# phone, you will need to use your computer's public IP address.
+# Find your IP with: ifconfig | grep "inet " | grep -v 127.0.0.1
+# Alternatively, you can run `npm run update-ip`, which will edit your 
+# EXPO_PUBLIC_API_URL variable in `.env`
+
+# Then uncomment and set:
+# EXPO_PUBLIC_API_URL=http://192.168.1.XXX:8000
+
+# An example of a valid public IP address on your local network is:
+# Note that this can change.
+# EXPO_PUBLIC_API_URL=http://192.168.1.228:8000
+
