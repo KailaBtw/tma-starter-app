@@ -104,6 +104,7 @@ export interface Module {
     id: number; // all fields except id seem to be nullable
     title: string;
     description?: string | null;
+    color?: string | null;
     created_at?: string | null;
     updated_at?: string | null;
 }
@@ -115,11 +116,14 @@ export interface ModuleDetail extends Module {
 export interface ModuleCreate {
     title: string;
     description?: string | null;
+    color?: string | null;
+    course_id?: number | null;
 }
 
 export interface ModuleUpdate {
     title?: string | null;
     description?: string | null;
+    color?: string | null;
 }
 
 // ============================================================================

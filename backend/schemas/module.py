@@ -12,12 +12,13 @@ class ModuleBase(BaseModel):
 
     title: str
     description: Optional[str] = None
+    color: Optional[str] = None
 
 
 class ModuleCreate(ModuleBase):
     """Schema for creating a new module"""
 
-    pass
+    course_id: Optional[int] = None
 
 
 class ModuleUpdate(BaseModel):
@@ -27,6 +28,7 @@ class ModuleUpdate(BaseModel):
 
     title: Optional[str] = None
     description: Optional[str] = None
+    color: Optional[str] = None
 
 
 class ModuleResponse(ModuleBase):
@@ -37,6 +39,7 @@ class ModuleResponse(ModuleBase):
     id: int
     created_at: datetime
     updated_at: datetime
+
     # When the Post schema is implemented, can
     # make this smarter.
     post_count: int = 0

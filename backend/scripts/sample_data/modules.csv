@@ -1,6 +1,6 @@
-title,description
-TestModule1,This is the first test module.
-TestModule2,This is the second test module.
-TestModule3,This is the third test module.
-TestModule4,This is the fourth test module.
-TestModule5,This is the fifth test module.
+title,description,color
+TestModule1,This is the first test module.,red
+TestModule2,This is the second test module.,orange
+TestModule3,This is the third test module.,yellow
+TestModule4,This is the fourth test module.,green
+TestModule5,This is the fifth test module.,blue

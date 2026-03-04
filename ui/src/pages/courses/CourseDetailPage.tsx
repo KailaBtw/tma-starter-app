@@ -68,7 +68,9 @@ export default function CourseDetailPage() {
     }
 
     function handleCreateModule() {
-        navigate('/dashboard/modules/new');
+        navigate('/dashboard/modules/new', {
+            state: { course_id: courseId },
+        }); // Should this go to /dashboard/courses/courseId/modules/new ??
     }
 
     async function handleUpdateCourse(e: React.FormEvent) {
