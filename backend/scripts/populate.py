@@ -586,7 +586,10 @@ async def main(reset: bool = False):
                 post_content = await populate_helper.create_post_content_from_csv(
                     db, post_content_d
                 )
-                post_content_lookup.append(post_content)
+                if post_content is not None:
+                    post_content_lookup.append(post_content)
+                else:
+                    print(f"'{post_content_d.get('post_title')}': post not found")
 
             await db.commit()
 

@@ -9,6 +9,7 @@ import {
 } from 'react-native-paper';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import ProtectedRoute from '../../../components/ProtectedRoute';
+import ModuleCard from '../../../components/modules/ModuleCard';
 import { getCourseDetail } from '../../../services/courses';
 import { CourseDetail, Module } from '../../../types';
 import { designTokens } from '../../../theme';
@@ -42,7 +43,11 @@ export default function CourseDetailScreen() {
         <ProtectedRoute>
             <View style={styles.container}>
                 <Appbar.Header>
-                    <Appbar.BackAction onPress={() => router.back()} />
+                    <Appbar.BackAction
+                        onPress={() => {
+                            router.replace('/(tabs)/courses');
+                        }}
+                    />
                     <Appbar.Content title={course?.title || 'Course'} />
                 </Appbar.Header>
 
@@ -109,77 +114,15 @@ export default function CourseDetailScreen() {
                                                 a.ordering - b.ordering
                                         )
                                         .map((module: Module) => (
-                                            <Card
-                                                key={module.module_id}
-                                                style={styles.card}
-                                                mode="elevated"
+                                            <ModuleCard
+                                                key={module.id}
+                                                module={module}
                                                 onPress={() =>
                                                     router.push(
-                                                        `/(tabs)/modules/${module.module_id}`
+                                                        `/(tabs)/modules/${module.id}?courseId=${courseId}`
                                                     )
                                                 }
-                                            >
-                                                <Card.Content
-                                                    style={{
-                                                        padding:
-                                                            designTokens.spacing
-                                                                .xl,
-                                                    }}
-                                                >
-                                                    <View
-                                                        style={
-                                                            styles.moduleHeader
-                                                        }
-                                                    >
-                                                        <View
-                                                            style={{
-                                                                flexDirection:
-                                                                    'row',
-                                                                alignItems:
-                                                                    'center',
-                                                                flex: 1,
-                                                            }}
-                                                        >
-                                                            {module.module_color && (
-                                                                <View
-                                                                    style={[
-                                                                        styles.colorIndicator,
-                                                                        {
-                                                                            backgroundColor:
-                                                                                module.module_color,
-                                                                        },
-                                                                    ]}
-                                                                />
-                                                            )}
-                                                            <Text
-                                                                variant="titleMedium"
-                                                                style={{
-                                                                    fontWeight:
-                                                                        '600',
-                                                                    flex: 1,
-                                                                }}
-                                                            >
-                                                                {
-                                                                    module.module_title
-                                                                }
-                                                            </Text>
-                                                        </View>
-                                                    </View>
-                                                    {module.module_description && (
-                                                        <Text
-                                                            variant="bodyMedium"
-                                                            style={
-                                                                styles.description
-                                                            }
-                                                            numberOfLines={2}
-                                                        >
-                                                            {
-                                                                module.module_description
-                                                            }
-                                                        </Text>
-                                                    )}
-                                                </Card.Content>
-                                            </Card>
+                                            />
                                         ))
                                 )}
                             </>
@@ -212,22 +155,5 @@ const styles = StyleSheet.create({
         marginBottom: designTokens.spacing.lg,
         marginTop: designTokens.spacing.sm,
         fontWeight: '600',
-    },
-    moduleHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginBottom: designTokens.spacing.sm,
-    },
-    colorIndicator: {
-        width: 20,
-        height: 20,
-        borderRadius: 10,
-        marginRight: designTokens.spacing.md,
-    },
-    description: {
-        marginTop: designTokens.spacing.sm,
-        opacity: 0.7,
-        lineHeight: 20,
     },
 });

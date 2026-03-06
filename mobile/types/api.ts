@@ -59,6 +59,7 @@ export interface UserCreate {
 export interface Course {
     id: number;
     title: string;
+    color?: string | null;
     description?: string | null;
     file_url?: string | null;
     module_count?: number;
@@ -67,19 +68,21 @@ export interface Course {
 }
 
 export interface Module {
-    module_id: number;
-    module_title: string;
-    module_description?: string | null;
-    module_color?: string | null;
+    id: number;
+    title: string;
+    description?: string | null;
+    color?: string | null;
     ordering: number;
-    course_id: number;
     created_at: string;
     updated_at: string;
+    course_id: number;
 }
 
 export interface Post {
     id: number;
     title: string;
+    description?: string | null;
+    color?: string | null;
     content?: string | null;
     post_type: string;
     module_id: number;
@@ -90,6 +93,10 @@ export interface Post {
 
 export interface CourseDetail extends Course {
     modules?: Module[];
+}
+
+export interface ModuleDetail extends Module {
+    posts?: Post[];
 }
 
 // ============================================================================

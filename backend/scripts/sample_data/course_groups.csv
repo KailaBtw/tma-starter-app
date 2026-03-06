@@ -3,7 +3,12 @@
 # ordering: integer for sorting courses within a group (lower numbers appear first)
 # date_assigned: date when course was assigned to group (YYYY-MM-DD)
 course_title,group_name,ordering,date_assigned
-Three Moves Ahead,Boone Parents Group,1,2026-01-15
-Three Moves Ahead,Atlanta Parents Group,1,2026-01-15
-Three Moves Ahead,Logan Parents Group,1,2026-01-15
-
+Age 1-3: Three Moves Ahead,Boone Parents Group,1,2026-01-15
+Age 1-3: Three Moves Ahead,Atlanta Parents Group,2,2026-01-15
+Age 1-3: Three Moves Ahead,Logan Parents Group,3,2026-01-15
+Age 4-6: Three Moves Ahead,Boone Parents Group,1,2026-01-15
+Age 4-6: Three Moves Ahead,Atlanta Parents Group,2,2026-01-15
+Age 4-6: Three Moves Ahead,Logan Parents Group,3,2026-01-15
+Age 7-9: Three Moves Ahead,Boone Parents Group,1,2026-01-15
+Age 7-9: Three Moves Ahead,Atlanta Parents Group,2,2026-01-15
+Age 7-9: Three Moves Ahead,Logan Parents Group,3,2026-01-15

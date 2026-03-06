@@ -8,7 +8,7 @@ from .course_user import CourseUser  # noqa: F401
 from .group import Group, UserGroup  # noqa: F401
 from .module import Module  # noqa: F401
 from .module_post import ModulePost  # noqa: F401
-from .post import Post  # noqa: F401
+from .post import Post, PostType  # noqa: F401
 from .post_content import PostContent  # noqa: F401
 from .role import Role  # noqa: F401
 from .user import User  # noqa: F401
