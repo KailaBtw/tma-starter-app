@@ -81,6 +81,7 @@ export interface Post {
     id: number;
     title: string;
     description?: string | null;
+    color?: string | null;
     content?: string | null;
     post_type: string;
     module_id: number;
@@ -92,6 +93,11 @@ export interface Post {
 export interface CourseDetail extends Course {
     modules?: Module[];
 }
+
+export interface ModuleDetail extends Module {
+    posts?: Post[];
+}
+
 
 // ============================================================================
 // Group Types
