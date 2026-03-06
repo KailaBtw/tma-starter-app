@@ -17,7 +17,10 @@ import { dummyPosts } from '../../../utils/dummyPost';
 
 
 export default function ModuleDetailScreen() {
-    const { id } = useLocalSearchParams<{ id: string }>();
+    const { id, courseId } = useLocalSearchParams<{
+        id: string;
+        courseId?: string;
+    }>();
     const router = useRouter();
     const moduleId = parseInt(id || '0', 10);
 
@@ -46,7 +49,19 @@ export default function ModuleDetailScreen() {
         <ProtectedRoute>
             <View style={styles.container}>
                 <Appbar.Header>
-                    <Appbar.BackAction onPress={() => router.back()} />
+                    <Appbar.BackAction
+                        onPress={() => {
+                            if (courseId) {
+                                router.replace(
+                                    `/(tabs)/courses/${courseId}`
+                                );
+                            } else if (router.canGoBack()) {
+                                router.back();
+                            } else {
+                                router.replace('/(tabs)/courses');
+                            }
+                        }}
+                    />
                     <Appbar.Content title={module?.title || 'Module'} />
                 </Appbar.Header>
 
@@ -103,7 +118,11 @@ export default function ModuleDetailScreen() {
                                             <PostCard
                                                 key={post.id}
                                                 post={post as Post}
-                                                onPress={() => router.push(`/(tabs)/posts/${post.id}`)}
+                                                onPress={() =>
+                                                router.push(
+                                                    `/(tabs)/posts/${post.id}?moduleId=${moduleId}${courseId ? `&courseId=${courseId}` : ''}`
+                                                )
+                                            }
                                             />
                                         ))
                                 )}

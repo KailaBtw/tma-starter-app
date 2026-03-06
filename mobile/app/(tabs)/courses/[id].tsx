@@ -43,7 +43,11 @@ export default function CourseDetailScreen() {
         <ProtectedRoute>
             <View style={styles.container}>
                 <Appbar.Header>
-                    <Appbar.BackAction onPress={() => router.back()} />
+                    <Appbar.BackAction
+                        onPress={() => {
+                            router.replace('/(tabs)/courses');
+                        }}
+                    />
                     <Appbar.Content title={course?.title || 'Course'} />
                 </Appbar.Header>
 
@@ -115,7 +119,7 @@ export default function CourseDetailScreen() {
                                                 module={module}
                                                 onPress={() =>
                                                     router.push(
-                                                        `/(tabs)/modules/${module.id}`
+                                                        `/(tabs)/modules/${module.id}?courseId=${courseId}`
                                                     )
                                                 }
                                             />
