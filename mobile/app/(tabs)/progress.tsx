@@ -46,14 +46,6 @@ export default function ProgressScreen() {
                         </Card.Content>
                     </Card>
                 </ScrollView>
-                <View //I added this as a test
-                    style={{
-                        flex: 1,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                    }}>
-                    <Text>This updates pretty fast! 🎉</Text>
-                </View> 
             </View>
         </ProtectedRoute>
     );
