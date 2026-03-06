@@ -9,6 +9,7 @@ import {
 } from 'react-native-paper';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import ProtectedRoute from '../../../components/ProtectedRoute';
+import ModuleCard from '../../../components/modules/ModuleCard';
 import { getCourseDetail } from '../../../services/courses';
 import { CourseDetail, Module } from '../../../types';
 import { designTokens } from '../../../theme';
@@ -109,77 +110,15 @@ export default function CourseDetailScreen() {
                                                 a.ordering - b.ordering
                                         )
                                         .map((module: Module) => (
-                                            <Card
+                                            <ModuleCard
                                                 key={module.id}
-                                                style={styles.card}
-                                                mode="elevated"
+                                                module={module}
                                                 onPress={() =>
                                                     router.push(
                                                         `/(tabs)/modules/${module.id}`
                                                     )
                                                 }
-                                            >
-                                                <Card.Content
-                                                    style={{
-                                                        padding:
-                                                            designTokens.spacing
-                                                                .xl,
-                                                    }}
-                                                >
-                                                    <View
-                                                        style={
-                                                            styles.moduleHeader
-                                                        }
-                                                    >
-                                                        <View
-                                                            style={{
-                                                                flexDirection:
-                                                                    'row',
-                                                                alignItems:
-                                                                    'center',
-                                                                flex: 1,
-                                                            }}
-                                                        >
-                                                            {module.color && (
-                                                                <View
-                                                                    style={[
-                                                                        styles.colorIndicator,
-                                                                        {
-                                                                            backgroundColor:
-                                                                                module.color,
-                                                                        },
-                                                                    ]}
-                                                                />
-                                                            )}
-                                                            <Text
-                                                                variant="titleMedium"
-                                                                style={{
-                                                                    fontWeight:
-                                                                        '600',
-                                                                    flex: 1,
-                                                                }}
-                                                            >
-                                                                {
-                                                                    module.title || 'Module'
-                                                                }
-                                                            </Text>
-                                                        </View>
-                                                    </View>
-                                                    {module.description && (
-                                                        <Text
-                                                            variant="bodyMedium"
-                                                            style={
-                                                                styles.description
-                                                            }
-                                                            numberOfLines={2}
-                                                        >
-                                                            {
-                                                                module.description
-                                                            }
-                                                        </Text>
-                                                    )}
-                                                </Card.Content>
-                                            </Card>
+                                            />
                                         ))
                                 )}
                             </>
@@ -212,22 +151,5 @@ const styles = StyleSheet.create({
         marginBottom: designTokens.spacing.lg,
         marginTop: designTokens.spacing.sm,
         fontWeight: '600',
-    },
-    moduleHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginBottom: designTokens.spacing.sm,
-    },
-    colorIndicator: {
-        width: 20,
-        height: 20,
-        borderRadius: 10,
-        marginRight: designTokens.spacing.md,
-    },
-    description: {
-        marginTop: designTokens.spacing.sm,
-        opacity: 0.7,
-        lineHeight: 20,
     },
 });
