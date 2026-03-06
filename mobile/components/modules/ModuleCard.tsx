@@ -10,11 +10,7 @@ export interface ModuleCardProps {
 
 export default function ModuleCard({ module, onPress }: ModuleCardProps) {
     return (
-        <Card
-            style={styles.card}
-            mode="elevated"
-            onPress={onPress}
-        >
+        <Card style={styles.card} mode="elevated" onPress={onPress}>
             <Card.Content style={styles.content}>
                 <View style={styles.moduleHeader}>
                     <View style={styles.titleRow}>
@@ -26,10 +22,7 @@ export default function ModuleCard({ module, onPress }: ModuleCardProps) {
                                 ]}
                             />
                         )}
-                        <Text
-                            variant="titleMedium"
-                            style={styles.title}
-                        >
+                        <Text variant="titleMedium" style={styles.title}>
                             {module.title || 'Module'}
                         </Text>
                     </View>

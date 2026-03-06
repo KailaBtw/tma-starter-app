@@ -11,10 +11,9 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import ProtectedRoute from '../../../components/ProtectedRoute';
 import PostCard from '../../../components/posts/PostCard';
 import { getModuleDetail } from '../../../services/modules';
-import { ModuleDetail, Module, Post } from '../../../types';
+import { ModuleDetail, Post } from '../../../types';
 import { designTokens } from '../../../theme';
 import { dummyPosts } from '../../../utils/dummyPost';
-
 
 export default function ModuleDetailScreen() {
     const { id, courseId } = useLocalSearchParams<{
@@ -52,9 +51,7 @@ export default function ModuleDetailScreen() {
                     <Appbar.BackAction
                         onPress={() => {
                             if (courseId) {
-                                router.replace(
-                                    `/(tabs)/courses/${courseId}`
-                                );
+                                router.replace(`/(tabs)/courses/${courseId}`);
                             } else if (router.canGoBack()) {
                                 router.back();
                             } else {
@@ -105,24 +102,37 @@ export default function ModuleDetailScreen() {
 
                                 {posts.length === 0 ? (
                                     <Card style={styles.card} mode="outlined">
-                                        <Card.Content style={{ padding: designTokens.spacing.xxl, alignItems: 'center' }}>
-                                            <Text variant="bodyMedium" style={{ opacity: 0.7 }}>
+                                        <Card.Content
+                                            style={{
+                                                padding:
+                                                    designTokens.spacing.xxl,
+                                                alignItems: 'center',
+                                            }}
+                                        >
+                                            <Text
+                                                variant="bodyMedium"
+                                                style={{ opacity: 0.7 }}
+                                            >
                                                 No posts in this module.
                                             </Text>
                                         </Card.Content>
                                     </Card>
                                 ) : (
                                     posts
-                                        .sort((a, b) => ('ordering' in a && 'ordering' in b ? a.ordering - b.ordering : (a.id - b.id)))
+                                        .sort((a, b) =>
+                                            'ordering' in a && 'ordering' in b
+                                                ? a.ordering - b.ordering
+                                                : a.id - b.id
+                                        )
                                         .map((post) => (
                                             <PostCard
                                                 key={post.id}
                                                 post={post as Post}
                                                 onPress={() =>
-                                                router.push(
-                                                    `/(tabs)/posts/${post.id}?moduleId=${moduleId}${courseId ? `&courseId=${courseId}` : ''}`
-                                                )
-                                            }
+                                                    router.push(
+                                                        `/(tabs)/posts/${post.id}?moduleId=${moduleId}${courseId ? `&courseId=${courseId}` : ''}`
+                                                    )
+                                                }
                                             />
                                         ))
                                 )}

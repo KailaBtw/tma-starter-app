@@ -10,11 +10,7 @@ export interface PostCardProps {
 
 export default function PostCard({ post, onPress }: PostCardProps) {
     return (
-        <Card
-            style={styles.card}
-            mode="elevated"
-            onPress={onPress}
-        >
+        <Card style={styles.card} mode="elevated" onPress={onPress}>
             <Card.Content style={styles.content}>
                 <View style={styles.postHeader}>
                     <View style={styles.titleRow}>
@@ -26,10 +22,7 @@ export default function PostCard({ post, onPress }: PostCardProps) {
                                 ]}
                             />
                         )}
-                        <Text
-                            variant="titleMedium"
-                            style={styles.title}
-                        >
+                        <Text variant="titleMedium" style={styles.title}>
                             {post.title || 'Post'}
                         </Text>
                     </View>
