@@ -17,7 +17,7 @@ class Course(Base):
     title = Column(String(200), nullable=False, index=True)
     description = Column(Text, nullable=True)
     file_url = Column(Text, nullable=True)
-    
+
     created_at = Column(TIMESTAMP, default=datetime.utcnow, nullable=False)
     updated_at = Column(
         TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
