@@ -13,10 +13,10 @@
         "type-check": "tsc --noEmit",
         "check": "npm run format:check && npm run lint:check && npm run type-check",
         "fix": "npm run format:fix && npm run lint:fix",
-        "update-ip": "bash ./scripts/update-env-ip.sh",
-        "start": "bash ./scripts/update-env-ip.sh --quiet && expo start",
-        "android": "bash ./scripts/update-env-ip.sh --quiet && expo start --android",
-        "ios": "bash ./scripts/update-env-ip.sh --quiet && expo start --ios",
+        "update-ip": "./scripts/update-env-ip.sh",
+        "start": "./scripts/update-env-ip.sh --quiet && expo start",
+        "android": "./scripts/update-env-ip.sh --quiet && expo start --android",
+        "ios": "./scripts/update-env-ip.sh --quiet && expo start --ios",
         "web": "expo start --web"
     },
     "dependencies": {
@@ -41,7 +41,8 @@
         "react-native-paper": "^5.14.5",
         "react-native-safe-area-context": "~5.6.0",
         "react-native-screens": "~4.16.0",
-        "react-native-web": "^0.21.2"
+        "react-native-web": "^0.21.2",
+        "react-native-webview": "13.15.0"
     },
     "devDependencies": {
         "@types/jest": "^30.0.0",
