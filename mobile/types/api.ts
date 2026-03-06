@@ -59,6 +59,7 @@ export interface UserCreate {
 export interface Course {
     id: number;
     title: string;
+    color?: string | null;
     description?: string | null;
     file_url?: string | null;
     module_count?: number;
