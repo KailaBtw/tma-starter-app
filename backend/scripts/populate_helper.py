@@ -12,6 +12,7 @@ from models import (
     ModulePost,
     Post,
     PostContent,
+    PostType,
     User,
 )
 
@@ -20,10 +21,16 @@ from models import (
 async def create_module(
     db: AsyncSession,
     title: str,
-    description: str,
-    color: str,
+    description: str | None = None,
+    color: str | None = None,
+    ordering: int = 0,
 ) -> Module:
-    module = Module(title=title, description=description, color=color)
+    module = Module(
+        title=title,
+        description=description,
+        color=color,
+        ordering=ordering,
+    )
     db.add(module)
     await db.flush()
 
@@ -31,20 +38,47 @@ async def create_module(
 
 
 async def create_module_from_csv(db: AsyncSession, module_data: dict) -> Module:
+    ordering = module_data.get("ordering")
+    if ordering is not None:
+        ordering = int(ordering)
+    else:
+        ordering = 0
     return await create_module(
         db,
         module_data["title"],
         module_data.get("description"),
+        module_data.get("color"),
+        ordering,
     )
+
+
+def _parse_post_type(value: str | None) -> PostType:
+    """Map CSV string to PostType enum; default to generic."""
+    if not value:
+        return PostType.generic
+    v = str(value).strip().lower()
+    try:
+        return PostType(v)
+    except ValueError:
+        return PostType.generic
 
 
 # Create post from CSV
 async def create_post(
     db: AsyncSession,
     title: str,
-    description: str,
+    description: str | None = None,
+    content: str | None = None,
+    post_type: PostType | None = None,
 ) -> Post:
-    post = Post(title=title, description=description)
+    if post_type is None:
+        post_type = PostType.generic
+    post = Post(
+        title=title,
+        description=description,
+        content=content,
+        post_type=post_type,
+    )
     db.add(post)
     await db.flush()
 
@@ -56,6 +90,8 @@ async def create_post_from_csv(db: AsyncSession, post_data: dict) -> Post:
         db,
         post_data["title"],
         post_data.get("description"),
+        post_data.get("content"),
+        _parse_post_type(post_data.get("post_type")),
     )
 
 
@@ -64,22 +100,15 @@ async def create_post_content(
     db: AsyncSession,
     post: Post,
     ordering: int,
-    content: str,
-    content_type: str,
+    content: str | None = None,
+    content_type: str | None = None,
 ) -> PostContent:
-    post_content = None
-
-    if post is not None:
-        post_content = PostContent(
-            post_id=post.id,
-            ordering=ordering,
-            content=content,
-            content_type=content_type,
-        )
-
-    else:
-        post_content = PostContent(content=content, content_type=content_type)
-
+    post_content = PostContent(
+        post_id=post.id,
+        ordering=ordering,
+        content=content,
+        content_type=content_type,
+    )
     db.add(post_content)
     await db.flush()
 
@@ -88,21 +117,25 @@ async def create_post_content(
 
 async def create_post_content_from_csv(
     db: AsyncSession, post_content_data: dict
-) -> PostContent:
+) -> PostContent | None:
     result = await db.execute(
         select(Post).where(Post.title == post_content_data["post_title"])
     )
     post = result.scalar_one_or_none()
-    ordering = post_content_data.get("ordering")
+    if post is None:
+        return None
 
+    ordering = post_content_data.get("ordering")
     if ordering is not None:
         ordering = int(ordering)
+    else:
+        ordering = 0
 
     return await create_post_content(
         db,
         post,
         ordering,
-        post_content_data["content"],
+        post_content_data.get("content"),
         post_content_data.get("content_type"),
     )
 

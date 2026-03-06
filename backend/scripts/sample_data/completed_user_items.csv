@@ -1,8 +1,8 @@
 username,course_title,module_title,post_title
-ksanft,Three Moves Ahead,NULL,NULL
-ksanft,NULL,TestModuleAlpha,NULL
-ksanft,NULL,TestModuleBeta,NULL
+ksanft,Age 1-3: Three Moves Ahead,NULL,NULL
+ksanft,NULL,TestModule1,NULL
+ksanft,NULL,TestModule2,NULL
 ksanft,NULL,NULL,TestPostUno
 ksanft,NULL,NULL,TestPostDos
-svanwart,NULL,TestModuleAlpha,NULL
+svanwart,NULL,TestModule1,NULL
 svanwart,NULL,NULL,TestPostUno

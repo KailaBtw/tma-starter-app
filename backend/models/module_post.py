@@ -18,10 +18,12 @@ class ModulePost(Base):
     post_id = Column(
         Integer, ForeignKey("posts.id", ondelete="CASCADE"), nullable=False
     )
-    ordering = Column(Integer, default=0)
+    ordering = Column(Integer, default=0, nullable=False)
 
-    created_at = Column(TIMESTAMP, default=datetime.utcnow)
-    updated_at = Column(TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(TIMESTAMP, default=datetime.utcnow, nullable=False)
+    updated_at = Column(
+        TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
+    )
 
     # Relationships
     post = relationship(

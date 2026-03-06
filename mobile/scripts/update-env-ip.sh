@@ -24,6 +24,9 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
     # Linux
     IP=$(hostname -I | awk '{print $1}' 2>/dev/null || ip route get 1.1.1.1 | awk '{print $7; exit}' 2>/dev/null || ifconfig | grep "inet " | grep -v 127.0.0.1 | awk '{print $2}' | head -1)
+elif [[ "$OSTYPE" == "msys" ]] || [[ "$OSTYPE" == "cygwin" ]] || [[ "$OSTYPE" == "msys2" ]]; then
+    # Windows (Git Bash, Cygwin, MSYS2) – use ipconfig
+    IP=$(ipconfig 2>/dev/null | grep "IPv4" | sed 's/.*: *//' | tr -d '\r' | grep -v '^127\.' | grep -v '^169\.' | head -1)
 else
     IP=$(ifconfig | grep "inet " | grep -v 127.0.0.1 | awk '{print $2}' | head -1)
 fi
