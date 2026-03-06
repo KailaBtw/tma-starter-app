@@ -12,12 +12,15 @@ class Module(Base):
     __tablename__ = "modules"
 
     id = Column(Integer, primary_key=True)
-    title = Column(Text)
-    description = Column(Text)
-    color = Column(Text)
+    title = Column(Text, nullable=False)
+    description = Column(Text, nullable=True)
+    color = Column(Text, nullable=True)
+    ordering = Column(Integer, default=0, nullable=False)
 
-    created_at = Column(TIMESTAMP, default=datetime.utcnow)
-    updated_at = Column(TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(TIMESTAMP, default=datetime.utcnow, nullable=False)
+    updated_at = Column(
+        TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
+    )
 
     # Many-to-Many Joins
     courses = association_proxy("course_modules", "courses")

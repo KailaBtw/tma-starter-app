@@ -72,14 +72,15 @@ export interface Module {
     description?: string | null;
     color?: string | null;
     ordering: number;
-    course_id: number;
     created_at: string;
     updated_at: string;
+    course_id: number;
 }
 
 export interface Post {
     id: number;
     title: string;
+    description?: string | null;
     content?: string | null;
     post_type: string;
     module_id: number;
